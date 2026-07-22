@@ -23,7 +23,7 @@ export default async function HomePage() {
         <FeaturedHero post={featured[0]} variant="wide" />
       )}
       {featured.length >= 2 && (
-        <div className="grid gap-7 md:grid-cols-2">
+        <div className="grid gap-7 lg:grid-cols-2">
           {featured.slice(0, 2).map((p, i) => (
             <FeaturedHero
               key={p.slug}

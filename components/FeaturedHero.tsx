@@ -60,11 +60,7 @@ export default function FeaturedHero({
   );
 
   const cover = (
-    <Zoomable
-      src={post.coverImage}
-      alt={post.title}
-      className={variant === "wide" ? "h-full" : ""}
-    >
+    <Zoomable src={post.coverImage} alt={post.title} className="h-full">
       <CoverImage
         src={post.coverImage}
         alt={post.title}
@@ -72,20 +68,21 @@ export default function FeaturedHero({
         sizes={
           variant === "wide"
             ? "(max-width: 768px) 100vw, 700px"
-            : "(max-width: 768px) 100vw, 620px"
+            : "(max-width: 1024px) 100vw, 340px"
         }
         className={
           variant === "wide"
             ? "h-full min-h-[240px] md:min-h-[420px]"
-            : "h-[240px] md:h-[280px]"
+            : "h-full min-h-[220px]"
         }
       />
     </Zoomable>
   );
 
   if (variant === "split") {
+    // Image on the LEFT, text on the right; stacks on mobile.
     return (
-      <section className="flex h-full flex-col overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme">
+      <section className="grid h-full overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme sm:grid-cols-[1.05fr_0.95fr]">
         {cover}
         {Body}
       </section>
