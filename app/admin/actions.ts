@@ -222,3 +222,52 @@ export async function getStats(): Promise<Stats> {
     pages,
   };
 }
+
+// ---- Subscribers & contact messages ----------------------------------
+
+export interface Subscriber {
+  id: string;
+  email: string;
+  name: string | null;
+  created_at: string;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string | null;
+  email: string;
+  message: string;
+  created_at: string;
+}
+
+export async function getSubscribers(): Promise<Subscriber[]> {
+  const supabase = createClient(await cookies());
+  const { data, error } = await supabase
+    .from("subscribers")
+    .select("id, email, name, created_at")
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return data as Subscriber[];
+}
+
+export async function getMessages(): Promise<ContactMessage[]> {
+  const supabase = createClient(await cookies());
+  const { data, error } = await supabase
+    .from("contact_messages")
+    .select("id, name, email, message, created_at")
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return data as ContactMessage[];
+}
+
+export async function deleteSubscriber(id: string) {
+  const supabase = createClient(await cookies());
+  await supabase.from("subscribers").delete().eq("id", id);
+  revalidatePath("/admin/subscribers");
+}
+
+export async function deleteMessage(id: string) {
+  const supabase = createClient(await cookies());
+  await supabase.from("contact_messages").delete().eq("id", id);
+  revalidatePath("/admin/subscribers");
+}

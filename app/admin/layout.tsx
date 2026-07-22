@@ -36,6 +36,12 @@ export default async function AdminLayout({
             <Link href="/admin/stats" className="text-muted hover:text-accent">
               Statistics
             </Link>
+            <Link
+              href="/admin/subscribers"
+              className="text-muted hover:text-accent"
+            >
+              Subscribers
+            </Link>
             <Link href="/admin/new" className="text-muted hover:text-accent">
               New Post
             </Link>

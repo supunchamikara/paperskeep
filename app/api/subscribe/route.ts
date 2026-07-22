@@ -5,11 +5,9 @@ import { createClient } from "@/utils/supabase/server";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Newsletter/contact subscribe endpoint — persists to Supabase.
- *
- * Inserts into the `subscribers` table (see supabase/schema.sql). Duplicate
- * emails are treated as success so re-subscribing is idempotent. The optional
- * `message`/`name` fields (from the contact form) are stored alongside.
+ * Newsletter subscribe endpoint — persists to the `subscribers` table.
+ * Duplicate emails are treated as success so re-subscribing is idempotent.
+ * (Contact-form messages go to /api/contact instead.)
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -19,10 +17,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const { email, name, message } = (body ?? {}) as {
+  const { email, name } = (body ?? {}) as {
     email?: unknown;
     name?: unknown;
-    message?: unknown;
   };
 
   if (typeof email !== "string" || !EMAIL_RE.test(email)) {
@@ -38,7 +35,6 @@ export async function POST(request: Request) {
   const { error } = await supabase.from("subscribers").insert({
     email: email.toLowerCase(),
     name: typeof name === "string" ? name : null,
-    message: typeof message === "string" ? message : null,
   });
 
   // 23505 = unique_violation → already subscribed; treat as success.

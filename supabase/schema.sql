@@ -25,9 +25,62 @@ create policy "Anyone can subscribe"
   to anon, authenticated
   with check (true);
 
--- NOTE: no SELECT policy is defined, so the subscriber list is NOT
--- readable with the publishable/anon key. Read it from the Dashboard
--- or with the service-role key in a trusted server context.
+-- Signed-in admins can read + delete the subscriber list (the anon/public
+-- key still cannot read it — no anon SELECT policy exists).
+drop policy if exists "Admins can read subscribers" on public.subscribers;
+create policy "Admins can read subscribers"
+  on public.subscribers
+  for select
+  to authenticated
+  using (true);
+
+drop policy if exists "Admins can delete subscribers" on public.subscribers;
+create policy "Admins can delete subscribers"
+  on public.subscribers
+  for delete
+  to authenticated
+  using (true);
+
+
+-- ============================================================
+-- Contact messages — submissions from the /contact form.
+-- Separate from subscribers (no unique email), so a person can send
+-- multiple messages and subscribers who write in aren't dropped.
+-- ============================================================
+create table if not exists public.contact_messages (
+  id          uuid primary key default gen_random_uuid(),
+  name        text,
+  email       text not null,
+  message     text not null,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists contact_messages_created_idx
+  on public.contact_messages (created_at desc);
+
+alter table public.contact_messages enable row level security;
+
+-- Anyone can send a message; only signed-in admins can read/delete them.
+drop policy if exists "Anyone can send a message" on public.contact_messages;
+create policy "Anyone can send a message"
+  on public.contact_messages
+  for insert
+  to anon, authenticated
+  with check (true);
+
+drop policy if exists "Admins can read messages" on public.contact_messages;
+create policy "Admins can read messages"
+  on public.contact_messages
+  for select
+  to authenticated
+  using (true);
+
+drop policy if exists "Admins can delete messages" on public.contact_messages;
+create policy "Admins can delete messages"
+  on public.contact_messages
+  for delete
+  to authenticated
+  using (true);
 
 
 -- ============================================================
