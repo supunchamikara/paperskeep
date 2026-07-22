@@ -84,7 +84,8 @@ export async function getAllPosts(): Promise<PostMeta[]> {
       .from("posts")
       .select("*")
       .eq("published", true)
-      .order("date", { ascending: false });
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("getAllPosts:", error.message);

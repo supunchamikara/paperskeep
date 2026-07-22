@@ -19,9 +19,17 @@ function formatDate(iso: string) {
   });
 }
 
-export default async function AdminDashboard() {
-  const posts = await getAdminPosts();
-  const published = posts.filter((p) => p.published).length;
+const PER_PAGE = 15;
+
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
+  const { posts, total, publishedTotal } = await getAdminPosts(page, PER_PAGE);
+  const pageCount = Math.max(1, Math.ceil(total / PER_PAGE));
+  const drafts = total - publishedTotal;
 
   return (
     <div className="mx-auto max-w-container px-5 py-10 sm:px-8 lg:px-12">
@@ -31,9 +39,8 @@ export default async function AdminDashboard() {
             Posts
           </h1>
           <p className="mt-1 font-body text-[15px] text-muted">
-            {posts.length} total · {published} published ·{" "}
-            {posts.length - published} draft
-            {posts.length - published === 1 ? "" : "s"}
+            {total} total · {publishedTotal} published · {drafts} draft
+            {drafts === 1 ? "" : "s"}
           </p>
         </div>
         <Link
@@ -44,7 +51,7 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      {posts.length === 0 ? (
+      {total === 0 ? (
         <div className="rounded-block border border-border bg-surface p-12 text-center shadow-token">
           <p className="mb-4 font-body text-[16px] text-muted">
             No posts yet. Run <code className="rounded bg-pill px-1.5 py-0.5">npm run db:seed</code>{" "}
@@ -127,6 +134,51 @@ export default async function AdminDashboard() {
             </table>
           </div>
         </div>
+      )}
+
+      {/* Pagination */}
+      {pageCount > 1 && (
+        <nav
+          aria-label="Pagination"
+          className="mt-6 flex flex-wrap items-center justify-center gap-2"
+        >
+          {page > 1 && (
+            <Link
+              href={`/admin?page=${page - 1}`}
+              aria-label="Previous page"
+              className="rounded-[6px] border border-border bg-surface px-3.5 py-2 font-heading text-[14px] font-semibold text-text transition-theme hover:border-accent hover:text-accent"
+            >
+              ←
+            </Link>
+          )}
+          {Array.from({ length: pageCount }).map((_, i) => {
+            const n = i + 1;
+            const active = n === page;
+            return (
+              <Link
+                key={n}
+                href={`/admin?page=${n}`}
+                aria-current={active ? "page" : undefined}
+                className={`h-10 min-w-[40px] rounded-[6px] border px-2 text-center font-heading text-[14px] font-semibold leading-[38px] transition-theme ${
+                  active
+                    ? "border-accent bg-accent text-white"
+                    : "border-border bg-surface text-text hover:border-accent hover:text-accent"
+                }`}
+              >
+                {n}
+              </Link>
+            );
+          })}
+          {page < pageCount && (
+            <Link
+              href={`/admin?page=${page + 1}`}
+              aria-label="Next page"
+              className="rounded-[6px] border border-border bg-surface px-3.5 py-2 font-heading text-[14px] font-semibold text-text transition-theme hover:border-accent hover:text-accent"
+            >
+              →
+            </Link>
+          )}
+        </nav>
       )}
     </div>
   );

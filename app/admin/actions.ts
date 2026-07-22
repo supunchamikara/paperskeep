@@ -145,15 +145,43 @@ export async function signOut() {
   redirect("/admin/login");
 }
 
-/** Admin-only fetch of ALL posts (drafts included). */
-export async function getAdminPosts(): Promise<PostRow[]> {
+export interface AdminPostsPage {
+  posts: PostRow[];
+  total: number;
+  publishedTotal: number;
+}
+
+/**
+ * Admin-only, paginated fetch of posts (drafts included), newest first.
+ * Returns the requested page plus total + published counts for the header.
+ */
+export async function getAdminPosts(
+  page = 1,
+  perPage = 15
+): Promise<AdminPostsPage> {
   const supabase = createClient(await cookies());
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .order("date", { ascending: false });
-  if (error) return [];
-  return data as PostRow[];
+  const from = Math.max(0, (page - 1) * perPage);
+  const to = from + perPage - 1;
+
+  const [pageRes, publishedRes] = await Promise.all([
+    supabase
+      .from("posts")
+      .select("*", { count: "exact" })
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .range(from, to),
+    supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("published", true),
+  ]);
+
+  if (pageRes.error) return { posts: [], total: 0, publishedTotal: 0 };
+  return {
+    posts: (pageRes.data as PostRow[]) ?? [],
+    total: pageRes.count ?? 0,
+    publishedTotal: publishedRes.count ?? 0,
+  };
 }
 
 export async function getAdminPost(id: string): Promise<PostRow | null> {
