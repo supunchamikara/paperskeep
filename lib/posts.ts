@@ -76,46 +76,62 @@ export function mapPost(row: PostRow): Post {
 
 const stripContent = ({ content, ...meta }: Post): PostMeta => meta;
 
-/** All published posts, newest first. Returns [] if the table isn't ready. */
+/** All published posts, newest first. Returns [] if Supabase isn't ready. */
 export async function getAllPosts(): Promise<PostMeta[]> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("published", true)
-    .order("date", { ascending: false });
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("published", true)
+      .order("date", { ascending: false });
 
-  if (error) {
-    console.error("getAllPosts:", error.message);
+    if (error) {
+      console.error("getAllPosts:", error.message);
+      return [];
+    }
+    return (data as PostRow[]).map(mapPost).map(stripContent);
+  } catch (e) {
+    // Missing env vars or an unreachable DB must never crash the build/render.
+    console.error("getAllPosts:", (e as Error).message);
     return [];
   }
-  return (data as PostRow[]).map(mapPost).map(stripContent);
 }
 
 /** A single published post by slug, or null. */
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("published", true)
+      .maybeSingle();
 
-  if (error || !data) return null;
-  return mapPost(data as PostRow);
+    if (error || !data) return null;
+    return mapPost(data as PostRow);
+  } catch (e) {
+    console.error("getPostBySlug:", (e as Error).message);
+    return null;
+  }
 }
 
 /** Slugs of published posts, for generateStaticParams. */
 export async function getPostSlugs(): Promise<string[]> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("slug")
-    .eq("published", true);
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("slug")
+      .eq("published", true);
 
-  if (error || !data) return [];
-  return data.map((r) => r.slug as string);
+    if (error || !data) return [];
+    return data.map((r) => r.slug as string);
+  } catch (e) {
+    console.error("getPostSlugs:", (e as Error).message);
+    return [];
+  }
 }
 
 /** The featured post (falls back to the newest). */

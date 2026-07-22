@@ -26,17 +26,18 @@ export async function POST(request: Request) {
       ? b.referrer.slice(0, 300)
       : null;
 
-  const supabase = createPublicClient();
-  const { error } = await supabase.from("page_views").insert({
-    path,
-    slug,
-    visitor_id: visitorId,
-    referrer,
-  });
-
-  if (error) {
-    // Non-fatal: never let analytics break navigation.
-    console.error("track:", error.message);
+  try {
+    const supabase = createPublicClient();
+    const { error } = await supabase.from("page_views").insert({
+      path,
+      slug,
+      visitor_id: visitorId,
+      referrer,
+    });
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    // Non-fatal: never let analytics break navigation or the build.
+    console.error("track:", (e as Error).message);
     return NextResponse.json({ ok: false }, { status: 200 });
   }
   return NextResponse.json({ ok: true });
