@@ -21,7 +21,7 @@ export default function PostCard({
           src={post.coverImage}
           alt={post.title}
           sizes="(max-width: 768px) 100vw, 400px"
-          className={compact ? "h-[150px]" : "h-[172px]"}
+          className={compact ? "h-[200px]" : "h-[240px]"}
         />
 
         <div className={compact ? "p-[18px]" : "p-5 pb-[22px]"}>

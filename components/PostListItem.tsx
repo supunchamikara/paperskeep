@@ -15,7 +15,7 @@ export default function PostListItem({ post }: { post: PostMeta }) {
           src={post.coverImage}
           alt={post.title}
           sizes="(max-width: 640px) 100vw, 240px"
-          className="h-[200px] w-full flex-shrink-0 sm:h-auto sm:w-[240px]"
+          className="h-[240px] w-full flex-shrink-0 sm:h-auto sm:w-[260px]"
         />
 
         <div className="flex flex-1 flex-col justify-center p-5 sm:p-6">
