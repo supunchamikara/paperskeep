@@ -3,10 +3,10 @@ import Image from "next/image";
 export interface ProductCardProps {
   title: string;
   image: string;
-  /** 0–5, one decimal (e.g. 4.8). */
-  rating: number;
-  /** Number of reviews/ratings. */
-  reviews: number;
+  /** 0–5, one decimal (e.g. 4.8). Accepts a number or numeric string. */
+  rating: number | string;
+  /** Number of reviews/ratings. Accepts a number or numeric string. */
+  reviews: number | string;
   /** Current/original price as a display string, e.g. "$229". */
   price: string;
   /** Optional sale price; when present, `price` is shown struck-through. */
@@ -76,6 +76,13 @@ export default function ProductCard({
   const hasSale = Boolean(salePrice);
   const displayPrice = hasSale ? salePrice! : price;
 
+  // MDX may hand these over as numbers or strings — coerce defensively so a
+  // "4.8" (or a missing value) never crashes rendering.
+  const ratingNum = Number(rating);
+  const safeRating = Number.isFinite(ratingNum) ? ratingNum : 0;
+  const reviewsNum = Number(reviews);
+  const safeReviews = Number.isFinite(reviewsNum) ? reviewsNum : 0;
+
   return (
     <div className="my-9 overflow-hidden rounded-block border border-border bg-surface shadow-token transition-theme not-prose">
       {/* Header + affiliate disclosure */}
@@ -107,9 +114,9 @@ export default function ProductCard({
           </h4>
 
           <div className="mb-3 flex items-center gap-[9px]">
-            <StarRating rating={rating} />
+            <StarRating rating={safeRating} />
             <span className="font-heading text-[13px] text-muted">
-              {rating.toFixed(1)} · {reviews.toLocaleString()} ratings
+              {safeRating.toFixed(1)} · {safeReviews.toLocaleString()} ratings
             </span>
           </div>
 
