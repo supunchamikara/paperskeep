@@ -11,6 +11,7 @@ import { extractToc } from "@/lib/toc";
 import MDXContent from "@/components/mdx/MDXContent";
 import CategoryPill from "@/components/CategoryPill";
 import CoverImage from "@/components/CoverImage";
+import Zoomable from "@/components/Zoomable";
 import BrandMark from "@/components/BrandMark";
 import ShareButtons from "@/components/ShareButtons";
 import PostCard from "@/components/PostCard";
@@ -140,14 +141,20 @@ export default async function ArticlePage({
               </div>
             </div>
 
-            {/* Hero image spans the reading column */}
-            <CoverImage
+            {/* Hero image spans the reading column (click to zoom) */}
+            <Zoomable
               src={post.coverImage}
               alt={post.title}
-              priority
-              sizes="(max-width: 1024px) 100vw, 820px"
-              className="mb-10 h-[300px] max-w-[820px] rounded-block sm:h-[460px]"
-            />
+              className="mb-10 max-w-[820px]"
+            >
+              <CoverImage
+                src={post.coverImage}
+                alt={post.title}
+                priority
+                sizes="(max-width: 1024px) 100vw, 820px"
+                className="h-[300px] rounded-block sm:h-[460px]"
+              />
+            </Zoomable>
 
             {/* Long-form MDX body */}
             <div className="max-w-[820px]">

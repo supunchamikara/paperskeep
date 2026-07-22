@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { MDXRemoteProps } from "next-mdx-remote/rsc";
 import ProductCard from "./ProductCard";
 import BuyCard from "./BuyCard";
+import Zoomable from "../Zoomable";
 
 /**
  * Components made available to every MDX post. `ProductCard` lets authors
@@ -18,13 +19,15 @@ export const mdxComponents: MDXRemoteProps["components"] = {
       alt?: string;
     };
     return (
-      <Image
-        src={src}
-        alt={alt}
-        width={760}
-        height={440}
-        className="h-auto w-full rounded-block"
-      />
+      <Zoomable src={src} alt={alt} className="my-8 rounded-block">
+        <Image
+          src={src}
+          alt={alt}
+          width={1200}
+          height={800}
+          className="h-auto w-full rounded-block"
+        />
+      </Zoomable>
     );
   },
   a: (props) => {
