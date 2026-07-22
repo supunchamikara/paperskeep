@@ -168,54 +168,57 @@ export async function getAdminPost(id: string): Promise<PostRow | null> {
 
 // ---- Analytics / statistics ------------------------------------------
 
-export interface StatsOverview {
-  total_views: number;
-  unique_visitors: number;
-  post_views: number;
-  views_today: number;
-  views_7d: number;
-  views_30d: number;
-}
-
-export interface DailyViewRow {
-  day: string;
+export interface PageStat {
+  path: string;
   views: number;
-}
-
-export interface TopPostRow {
-  slug: string;
+  isPost: boolean;
   title: string | null;
-  views: number;
+  slug: string | null;
 }
 
-const EMPTY_OVERVIEW: StatsOverview = {
-  total_views: 0,
-  unique_visitors: 0,
-  post_views: 0,
-  views_today: 0,
-  views_7d: 0,
-  views_30d: 0,
-};
+export interface Stats {
+  totalViews: number;
+  articleViews: number;
+  pagesTracked: number;
+  pages: PageStat[];
+}
 
-export async function getStats(days = 14): Promise<{
-  overview: StatsOverview;
-  daily: DailyViewRow[];
-  topPosts: TopPostRow[];
-}> {
+/**
+ * Reads the per-page view counters (public.page_stats), joined to post titles.
+ * One row per page — ordered most-viewed first.
+ */
+export async function getStats(): Promise<Stats> {
   const supabase = createClient(await cookies());
 
-  const [overviewRes, dailyRes, topRes] = await Promise.all([
-    supabase.rpc("stats_overview"),
-    supabase.rpc("views_daily", { p_days: days }),
-    supabase.rpc("top_posts", { p_limit: 8 }),
-  ]);
+  const { data, error } = await supabase
+    .from("page_stats")
+    .select("path, views, post_id, posts(title, slug)")
+    .order("views", { ascending: false });
 
-  const overview =
-    (overviewRes.data as StatsOverview[] | null)?.[0] ?? EMPTY_OVERVIEW;
+  if (error || !data) {
+    return { totalViews: 0, articleViews: 0, pagesTracked: 0, pages: [] };
+  }
+
+  const pages: PageStat[] = data.map((row) => {
+    // The embedded post is a to-one relation; normalize array/object shapes.
+    const rel = (row as { posts?: unknown }).posts;
+    const post = (Array.isArray(rel) ? rel[0] : rel) as
+      | { title?: string; slug?: string }
+      | null
+      | undefined;
+    return {
+      path: row.path as string,
+      views: Number(row.views) || 0,
+      isPost: Boolean((row as { post_id?: string }).post_id),
+      title: post?.title ?? null,
+      slug: post?.slug ?? null,
+    };
+  });
 
   return {
-    overview,
-    daily: (dailyRes.data as DailyViewRow[] | null) ?? [],
-    topPosts: (topRes.data as TopPostRow[] | null) ?? [],
+    totalViews: pages.reduce((sum, p) => sum + p.views, 0),
+    articleViews: pages.filter((p) => p.isPost).reduce((s, p) => s + p.views, 0),
+    pagesTracked: pages.length,
+    pages,
   };
 }

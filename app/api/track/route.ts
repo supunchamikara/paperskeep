@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { createPublicClient } from "@/utils/supabase/public";
 
 /**
- * Records a single page view. Called by the client <Analytics /> beacon on
- * every public navigation. Inserts with the anon key (RLS allows anon INSERT
- * but not SELECT, so the raw view log stays private to admins).
+ * Records a single page view by incrementing that page's counter
+ * (public.increment_page_view). Called by the client <Analytics /> beacon on
+ * every public navigation. One row per page — no per-view bulk records.
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -19,24 +19,16 @@ export async function POST(request: Request) {
   if (!path) return NextResponse.json({ ok: false }, { status: 400 });
 
   const slug = typeof b.slug === "string" ? b.slug.slice(0, 200) : null;
-  const visitorId =
-    typeof b.visitorId === "string" ? b.visitorId.slice(0, 64) : null;
-  const referrer =
-    typeof b.referrer === "string" && b.referrer
-      ? b.referrer.slice(0, 300)
-      : null;
 
   try {
     const supabase = createPublicClient();
-    const { error } = await supabase.from("page_views").insert({
-      path,
-      slug,
-      visitor_id: visitorId,
-      referrer,
+    const { error } = await supabase.rpc("increment_page_view", {
+      p_path: path,
+      p_slug: slug,
     });
     if (error) throw new Error(error.message);
   } catch (e) {
-    // Non-fatal: never let analytics break navigation or the build.
+    // Non-fatal: analytics must never break navigation or the build.
     console.error("track:", (e as Error).message);
     return NextResponse.json({ ok: false }, { status: 200 });
   }

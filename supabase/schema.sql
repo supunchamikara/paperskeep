@@ -111,86 +111,68 @@ create policy "Admins can delete posts"
 
 
 -- ============================================================
--- Analytics — one row per page view. Powers the /admin/stats page.
+-- Analytics — ONE counter row per page (not one row per view).
+-- Each visit increments the counter. A post's row is auto-removed
+-- when the post is deleted (post_id FK, ON DELETE CASCADE).
 -- ============================================================
-create table if not exists public.page_views (
-  id          uuid primary key default gen_random_uuid(),
-  path        text not null,
-  slug        text,               -- set for article views (/articles/[slug])
-  visitor_id  text,               -- client-generated id (approx unique visitors)
-  referrer    text,
-  created_at  timestamptz not null default now()
+
+-- Drop the old per-view event log + its aggregate functions if present.
+drop function if exists public.stats_overview();
+drop function if exists public.views_daily(int);
+drop function if exists public.top_posts(int);
+drop table if exists public.page_views;
+
+create table if not exists public.page_stats (
+  path        text primary key,                                   -- e.g. /articles/my-post
+  post_id     uuid references public.posts(id) on delete cascade, -- null for non-post pages
+  views       bigint not null default 0,
+  updated_at  timestamptz not null default now()
 );
 
-create index if not exists page_views_created_idx on public.page_views (created_at);
-create index if not exists page_views_slug_idx on public.page_views (slug);
-create index if not exists page_views_visitor_idx on public.page_views (visitor_id);
+create index if not exists page_stats_post_idx on public.page_stats (post_id);
+create index if not exists page_stats_views_idx on public.page_stats (views desc);
 
-alter table public.page_views enable row level security;
+alter table public.page_stats enable row level security;
 
--- Anyone can record a view (public site is un-authenticated)…
-drop policy if exists "Anyone can record a view" on public.page_views;
-create policy "Anyone can record a view"
-  on public.page_views
-  for insert
-  to anon, authenticated
-  with check (true);
-
--- …but only signed-in admins can read the raw rows / run the stats.
-drop policy if exists "Admins can read views" on public.page_views;
-create policy "Admins can read views"
-  on public.page_views
+-- Only signed-in admins can read the counts.
+drop policy if exists "Admins can read page stats" on public.page_stats;
+create policy "Admins can read page stats"
+  on public.page_stats
   for select
   to authenticated
   using (true);
 
--- ---- Aggregate functions (SECURITY INVOKER: RLS still applies) ----
+-- Public views are recorded ONLY through this function (no direct table
+-- write is granted to anon), so a visitor can increment a counter by one but
+-- can never set an arbitrary value. SECURITY DEFINER bypasses RLS to write.
+create or replace function public.increment_page_view(
+  p_path text,
+  p_slug text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_post_id uuid;
+begin
+  if p_path is null or length(p_path) = 0 then
+    return;
+  end if;
 
--- Headline totals for the stat tiles.
-create or replace function public.stats_overview()
-returns table (
-  total_views     bigint,
-  unique_visitors bigint,
-  post_views      bigint,
-  views_today     bigint,
-  views_7d        bigint,
-  views_30d       bigint
-) language sql stable as $$
-  select
-    count(*)::bigint,
-    count(distinct visitor_id)::bigint,
-    count(*) filter (where slug is not null)::bigint,
-    count(*) filter (where created_at >= date_trunc('day', now()))::bigint,
-    count(*) filter (where created_at >= now() - interval '7 days')::bigint,
-    count(*) filter (where created_at >= now() - interval '30 days')::bigint
-  from public.page_views;
+  -- Link post pages to their post so the row cascades on delete.
+  if p_slug is not null then
+    select id into v_post_id from public.posts where slug = p_slug;
+  end if;
+
+  insert into public.page_stats (path, post_id, views, updated_at)
+  values (left(p_path, 300), v_post_id, 1, now())
+  on conflict (path) do update
+    set views = public.page_stats.views + 1,
+        post_id = coalesce(excluded.post_id, public.page_stats.post_id),
+        updated_at = now();
+end;
 $$;
 
--- Daily view counts for the last p_days (gap-filled so empty days show 0).
-create or replace function public.views_daily(p_days int default 14)
-returns table (day date, views bigint)
-language sql stable as $$
-  select d::date as day, count(pv.id)::bigint as views
-  from generate_series(
-    (current_date - (p_days - 1))::timestamptz,
-    current_date::timestamptz,
-    interval '1 day'
-  ) as d
-  left join public.page_views pv
-    on pv.created_at >= d and pv.created_at < d + interval '1 day'
-  group by d
-  order by d;
-$$;
-
--- Most-viewed posts, joined to their titles.
-create or replace function public.top_posts(p_limit int default 8)
-returns table (slug text, title text, views bigint)
-language sql stable as $$
-  select pv.slug, p.title, count(*)::bigint as views
-  from public.page_views pv
-  left join public.posts p on p.slug = pv.slug
-  where pv.slug is not null
-  group by pv.slug, p.title
-  order by views desc
-  limit p_limit;
-$$;
+grant execute on function public.increment_page_view(text, text) to anon, authenticated;

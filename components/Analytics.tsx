@@ -3,27 +3,10 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-/** Stable per-browser id (approximates unique visitors), stored locally. */
-function getVisitorId(): string | null {
-  try {
-    let id = localStorage.getItem("paperskeep_vid");
-    if (!id) {
-      id =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : String(Date.now()) + Math.random().toString(36).slice(2);
-      localStorage.setItem("paperskeep_vid", id);
-    }
-    return id;
-  } catch {
-    return null;
-  }
-}
-
 /**
- * Fire-and-forget page-view beacon. Mounted once in the root layout; sends a
- * view on every route change. Admin pages are excluded so internal browsing
- * doesn't skew the stats.
+ * Fire-and-forget page-view beacon. Mounted once in the root layout; on every
+ * route change it bumps that page's counter via /api/track. Admin pages are
+ * excluded so internal browsing doesn't skew the stats.
  */
 export default function Analytics() {
   const pathname = usePathname();
@@ -35,12 +18,7 @@ export default function Analytics() {
       ? pathname.slice("/articles/".length)
       : null;
 
-    const payload = JSON.stringify({
-      path: pathname,
-      slug,
-      visitorId: getVisitorId(),
-      referrer: document.referrer || null,
-    });
+    const payload = JSON.stringify({ path: pathname, slug });
 
     try {
       if (navigator.sendBeacon) {
