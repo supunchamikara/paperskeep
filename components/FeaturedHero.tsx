@@ -80,9 +80,9 @@ export default function FeaturedHero({
   );
 
   if (variant === "split") {
-    // Image on the LEFT, text on the right; stacks on mobile.
+    // Image on the LEFT, text on the right (1:3 ratio); stacks on mobile.
     return (
-      <section className="grid h-full overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme sm:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid h-full overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme sm:grid-cols-[1fr_3fr]">
         {cover}
         {Body}
       </section>
