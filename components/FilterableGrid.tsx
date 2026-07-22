@@ -9,8 +9,9 @@ const CATEGORIES = ["All", "Technology", "Business", "Lifestyle", "Culture"];
 
 type View = "grid" | "list";
 
-// Posts per page depends on the layout (grid packs more per row).
-const PER_PAGE: Record<View, number> = { grid: 6, list: 5 };
+const GRID_GAP = 26; // px, matches the grid gap below
+const GRID_ROWS_PER_PAGE = 3; // grid: show this many full rows per page
+const LIST_PER_PAGE = 5;
 
 /**
  * Client-side filterable post list with a grid/list view toggle and
@@ -34,7 +35,29 @@ export default function FilterableGrid({
   const [tag, setTag] = useState<string | undefined>(initialTag);
   const [view, setView] = useState<View>("grid");
   const [page, setPage] = useState(1);
+  const [gridCols, setGridCols] = useState(2);
   const topRef = useRef<HTMLDivElement>(null);
+
+  const minCardPx = columns === 3 ? 260 : 300;
+
+  // Measure how many columns actually fit and page by whole rows, so a wider
+  // screen shows more posts per page (never fewer than fit on screen).
+  useEffect(() => {
+    const el = topRef.current;
+    if (!el) return;
+    const measure = () => {
+      const w = el.clientWidth;
+      const cols = Math.max(
+        1,
+        Math.floor((w + GRID_GAP) / (minCardPx + GRID_GAP))
+      );
+      setGridCols(cols);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [minCardPx]);
 
   const filtered = useMemo(() => {
     let list = posts;
@@ -43,7 +66,8 @@ export default function FilterableGrid({
     return list;
   }, [posts, category, tag]);
 
-  const perPage = PER_PAGE[view];
+  const perPage =
+    view === "list" ? LIST_PER_PAGE : gridCols * GRID_ROWS_PER_PAGE;
   const pageCount = Math.max(1, Math.ceil(filtered.length / perPage));
 
   // Keep the page in range whenever the filtered set or page size changes.
