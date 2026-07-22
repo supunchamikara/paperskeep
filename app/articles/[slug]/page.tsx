@@ -11,6 +11,7 @@ import { siteConfig } from "@/lib/site";
 import { extractToc } from "@/lib/toc";
 import MDXContent from "@/components/mdx/MDXContent";
 import CategoryPill from "@/components/CategoryPill";
+import BrandMark from "@/components/BrandMark";
 import ShareButtons from "@/components/ShareButtons";
 import PostCard from "@/components/PostCard";
 import NewsletterForm from "@/components/NewsletterForm";
@@ -125,9 +126,7 @@ export default async function ArticlePage({
               {/* Byline row */}
               <div className="mb-9 flex flex-wrap items-center justify-between gap-4 border-y border-border py-5">
                 <div className="flex items-center gap-3.5">
-                  <span className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-[8px] bg-accent font-heading text-[22px] font-extrabold text-white">
-                    P
-                  </span>
+                  <BrandMark size={46} className="flex-shrink-0 drop-shadow-sm" />
                   <div>
                     <div className="font-heading text-[15px] font-bold text-text">
                       {byline}

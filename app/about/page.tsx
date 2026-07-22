@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
+import BrandMark from "@/components/BrandMark";
 import SocialIcons from "@/components/SocialIcons";
 
 export const metadata: Metadata = {
@@ -64,9 +65,7 @@ export default function AboutPage() {
 
       {/* Brand card */}
       <div className="mt-12 flex flex-col items-start gap-5 rounded-block border border-border bg-surface p-7 shadow-token transition-theme sm:flex-row sm:items-center">
-        <span className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-[10px] bg-accent font-heading text-[36px] font-extrabold text-white">
-          P
-        </span>
+        <BrandMark size={80} className="flex-shrink-0 drop-shadow-sm" />
         <div className="flex-1">
           <div className="font-heading text-[18px] font-bold text-text">
             {author.name}

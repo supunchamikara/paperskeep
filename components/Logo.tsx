@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandMark from "./BrandMark";
 
 export default function Logo({
   size = "md",
@@ -7,22 +8,25 @@ export default function Logo({
   size?: "sm" | "md";
   onNavy?: boolean;
 }) {
-  const box = size === "sm" ? "h-[26px] w-[26px] text-[14px] rounded-[6px]" : "h-[30px] w-[30px] text-[16px] rounded-[6px]";
+  const px = size === "sm" ? 26 : 30;
   const label = size === "sm" ? "text-[16px]" : "text-[19px]";
   return (
-    <Link href="/" className="flex items-center gap-3" aria-label="Paperskeep home">
-      <span
-        className={`flex items-center justify-center bg-accent font-heading font-extrabold text-white ${box}`}
-      >
-        P
-      </span>
+    <Link
+      href="/"
+      className="group flex items-center gap-2.5"
+      aria-label="Paperskeep home"
+    >
+      <BrandMark
+        size={px}
+        className="drop-shadow-sm transition-transform duration-200 group-hover:scale-105"
+      />
       {size === "md" && (
         <span
-          className={`font-heading font-bold tracking-[-0.01em] ${label} ${
+          className={`font-heading font-bold tracking-[-0.015em] ${label} ${
             onNavy ? "text-white" : "text-text"
           }`}
         >
-          Paperskeep
+          Paper<span className="text-accent">skeep</span>
         </span>
       )}
     </Link>
