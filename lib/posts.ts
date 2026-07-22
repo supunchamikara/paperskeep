@@ -141,6 +141,20 @@ export async function getFeaturedPost(): Promise<PostMeta | null> {
 }
 
 /**
+ * Up to `limit` featured posts for the home hero row. Uses posts flagged
+ * `featured` first, then fills with the newest others so the row is complete.
+ */
+export async function getFeaturedPosts(limit = 2): Promise<PostMeta[]> {
+  const posts = await getAllPosts();
+  const featured = posts.filter((p) => p.featured);
+  if (featured.length >= limit) return featured.slice(0, limit);
+  const fill = posts
+    .filter((p) => !featured.some((f) => f.slug === p.slug))
+    .slice(0, limit - featured.length);
+  return [...featured, ...fill].slice(0, limit);
+}
+
+/**
  * Related posts: same category first, then fill with the newest others.
  * Excludes the current post. Returns up to `limit`.
  */
