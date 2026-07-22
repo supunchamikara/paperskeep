@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Design tokens — light theme is the default on :root.
+   The `.dark` class (applied by next-themes) swaps the values.
+   All theme-aware colors read from these variables, so switching
+   themes animates smoothly via the `transition-theme` utility.
+   ============================================================ */
+:root {
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --text: #333333;
+  --muted: #64748b;
+  --navy: #1e293b;
+  --accent: #2c8c87;
+  --accent-strong: #216f6a;
+  --border: #e7eaee;
+  --pill: #f1f5f9;
+  --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+.dark {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --text: #e5eaf1;
+  --muted: #93a2b7;
+  --navy: #0b1220;
+  --accent: #38b2a6;
+  --accent-strong: #2c8c83;
+  --border: #2b3a4d;
+  --pill: #22303f;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-lora), Georgia, serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--accent);
+    color: #fff;
+  }
+  /* Visible, consistent keyboard focus ring across the app. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Layered soft shadow that follows the active theme. */
+  .shadow-token {
+    box-shadow: var(--shadow);
+  }
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
+  }
+
+  /* Category / tag pill */
+  .pill {
+    @apply inline-flex items-center rounded-pill font-heading font-semibold transition-theme;
+  }
+}
+
+/* ============================================================
+   Long-form article typography (applied to the MDX container).
+   ============================================================ */
+.prose-paperskeep {
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 19px;
+  line-height: 1.8;
+  color: var(--text);
+}
+.prose-paperskeep p {
+  margin: 0 0 26px;
+}
+.prose-paperskeep h2 {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 44px 0 18px;
+  scroll-margin-top: 96px;
+}
+.prose-paperskeep h3 {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.3;
+  color: var(--text);
+  margin: 36px 0 14px;
+  scroll-margin-top: 96px;
+}
+.prose-paperskeep a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-paperskeep a:hover {
+  color: var(--accent-strong);
+}
+.prose-paperskeep ul,
+.prose-paperskeep ol {
+  margin: 0 0 26px;
+  padding-left: 24px;
+}
+.prose-paperskeep li {
+  margin: 0 0 10px;
+}
+.prose-paperskeep blockquote {
+  margin: 36px 0;
+  padding: 6px 0 6px 28px;
+  border-left: 4px solid var(--accent);
+  font-size: 23px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--text);
+}
+.prose-paperskeep blockquote p {
+  margin: 0;
+}
+.prose-paperskeep img {
+  border-radius: 10px;
+  margin: 30px 0;
+}
+.prose-paperskeep code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.85em;
+  background: var(--pill);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.prose-paperskeep pre {
+  background: var(--navy);
+  color: #e5eaf1;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 30px 0;
+}
+.prose-paperskeep pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+.prose-paperskeep hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}

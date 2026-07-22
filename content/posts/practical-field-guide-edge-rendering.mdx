@@ -1,0 +1,37 @@
+---
+title: "A Practical Field Guide to Edge Rendering"
+excerpt: "When it helps, when it hurts, and the metrics that actually tell you which. A no-hype look at rendering at the edge."
+category: "Technology"
+date: "2026-07-03"
+coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80"
+tags: ["Edge", "Performance", "Web Platform", "Engineering"]
+author: "Paperskeep"
+---
+
+Edge rendering gets pitched as a free performance win: run your code closer to users, everything gets faster. Reality is more nuanced. Moving compute to the edge helps some workloads dramatically and quietly hurts others. Knowing which is which saves you a painful migration.
+
+## Where the edge shines
+
+The edge is a latency tool. It pays off when the bottleneck is the round trip between the user and your origin:
+
+- Personalization that must happen before first paint.
+- Auth checks and redirects that gate a page.
+- Geographically-aware content — currency, language, compliance.
+
+For these, shaving the origin round trip is a real, measurable win.
+
+> "The edge doesn't make your code faster. It makes the distance shorter. Only one of those is your bottleneck."
+
+## Where it quietly hurts
+
+Edge runtimes trade capability for reach. Your database probably lives in one region; calling it from fifty edge locations can be *slower* than a single well-placed origin. Cold starts, limited runtimes, and data locality all conspire against naive edge deployments.
+
+## The metrics that tell the truth
+
+Ignore synthetic benchmarks. Watch these instead:
+
+1. **Time to First Byte**, segmented by region.
+2. **Origin round-trip count** per request — the edge can't help what it still has to fetch.
+3. **p95, not average** — the edge's whole job is taming the tail.
+
+If moving to the edge doesn't improve regional p95 TTFB, it isn't helping — it's just relocating your complexity. Measure first, migrate second, and let the numbers, not the marketing, decide.

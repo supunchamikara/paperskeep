@@ -1,0 +1,31 @@
+---
+title: "Why Local-First Software Is Finally Ready"
+excerpt: "Sync engines matured. The tradeoffs that killed early attempts are mostly solved now — here's what changed and what to build with."
+category: "Technology"
+date: "2026-07-15"
+coverImage: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?auto=format&fit=crop&w=1200&q=80"
+tags: ["Local-First", "Sync", "CRDTs", "Engineering"]
+author: "Paperskeep"
+---
+
+Local-first software has been "almost ready" for the better part of a decade. The promise was seductive: apps that work offline, sync instantly, and never lose your data — with no spinner between you and your own work. The reality kept tripping over the same rock: conflict resolution.
+
+## The problem that wouldn't die
+
+When two people edit the same document offline and reconnect, whose version wins? The naive answers — last-write-wins, manual merge prompts — either lose data or annoy users into abandonment. For years that was enough to keep local-first in the "cool demo" category.
+
+> "Sync is easy until two people disagree. Everything hard about local-first lives in that disagreement."
+
+## What changed
+
+Conflict-free replicated data types (CRDTs) went from academic curiosity to production-grade libraries. Sync engines now ship with battle-tested merge semantics, so you're no longer inventing distributed-systems primitives to build a note-taking app.
+
+The tradeoffs that remain are real but bounded:
+
+- **Storage overhead** from operation logs, mitigated by compaction.
+- **Schema evolution** across offline clients, which needs a versioning discipline.
+- **Discovery and auth**, still very much your problem to solve.
+
+## Where to start
+
+Don't rewrite your whole stack. Pick one surface — a settings panel, a draft editor — and make it local-first. You'll feel the difference immediately: interactions that used to round-trip to a server now happen at the speed of thought. That feeling is the entire pitch, and it finally holds up.
