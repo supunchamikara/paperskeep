@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { PostMeta } from "@/lib/posts";
 import CategoryPill from "./CategoryPill";
+import CoverImage from "./CoverImage";
 
 /** Horizontal list-row variant of a post, used by the "list" view. */
 export default function PostListItem({ post }: { post: PostMeta }) {
@@ -11,15 +11,12 @@ export default function PostListItem({ post }: { post: PostMeta }) {
         href={`/articles/${post.slug}`}
         className="flex flex-col sm:flex-row"
       >
-        <div className="relative h-[180px] w-full flex-shrink-0 sm:h-auto sm:w-[240px]">
-          <Image
-            src={post.coverImage}
-            alt={post.title}
-            fill
-            sizes="(max-width: 640px) 100vw, 240px"
-            className="object-cover"
-          />
-        </div>
+        <CoverImage
+          src={post.coverImage}
+          alt={post.title}
+          sizes="(max-width: 640px) 100vw, 240px"
+          className="h-[200px] w-full flex-shrink-0 sm:h-auto sm:w-[240px]"
+        />
 
         <div className="flex flex-1 flex-col justify-center p-5 sm:p-6">
           <CategoryPill category={post.category} />

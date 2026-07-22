@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { PostMeta } from "@/lib/posts";
 import CategoryPill from "./CategoryPill";
+import CoverImage from "./CoverImage";
 
 /**
  * Post card used in the home/articles grid.
@@ -17,15 +17,12 @@ export default function PostCard({
   return (
     <article className="hover-lift group overflow-hidden rounded-card border border-border bg-surface shadow-token transition-theme">
       <Link href={`/articles/${post.slug}`} className="block">
-        <div className={`relative ${compact ? "h-[150px]" : "h-[172px]"}`}>
-          <Image
-            src={post.coverImage}
-            alt={post.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 400px"
-            className="object-cover"
-          />
-        </div>
+        <CoverImage
+          src={post.coverImage}
+          alt={post.title}
+          sizes="(max-width: 768px) 100vw, 400px"
+          className={compact ? "h-[150px]" : "h-[172px]"}
+        />
 
         <div className={compact ? "p-[18px]" : "p-5 pb-[22px]"}>
           <CategoryPill category={post.category} />

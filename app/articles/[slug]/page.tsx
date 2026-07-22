@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -11,6 +10,7 @@ import { siteConfig } from "@/lib/site";
 import { extractToc } from "@/lib/toc";
 import MDXContent from "@/components/mdx/MDXContent";
 import CategoryPill from "@/components/CategoryPill";
+import CoverImage from "@/components/CoverImage";
 import BrandMark from "@/components/BrandMark";
 import ShareButtons from "@/components/ShareButtons";
 import PostCard from "@/components/PostCard";
@@ -141,16 +141,13 @@ export default async function ArticlePage({
             </div>
 
             {/* Hero image spans the reading column */}
-            <div className="relative mb-10 h-[240px] max-w-[820px] overflow-hidden rounded-block sm:h-[420px]">
-              <Image
-                src={post.coverImage}
-                alt={post.title}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 820px"
-                className="object-cover"
-              />
-            </div>
+            <CoverImage
+              src={post.coverImage}
+              alt={post.title}
+              priority
+              sizes="(max-width: 1024px) 100vw, 820px"
+              className="mb-10 h-[300px] max-w-[820px] rounded-block sm:h-[460px]"
+            />
 
             {/* Long-form MDX body */}
             <div className="max-w-[820px]">

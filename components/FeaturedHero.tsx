@@ -1,21 +1,18 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { PostMeta } from "@/lib/posts";
+import CoverImage from "./CoverImage";
 
 /** 2-column featured hero card driven by the post with `featured: true`. */
 export default function FeaturedHero({ post }: { post: PostMeta }) {
   return (
     <section className="grid overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme md:grid-cols-[1.15fr_0.85fr]">
-      <div className="relative min-h-[240px] md:min-h-[420px]">
-        <Image
-          src={post.coverImage}
-          alt={post.title}
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, 700px"
-          className="object-cover"
-        />
-      </div>
+      <CoverImage
+        src={post.coverImage}
+        alt={post.title}
+        priority
+        sizes="(max-width: 768px) 100vw, 700px"
+        className="min-h-[240px] md:min-h-[420px]"
+      />
 
       <div className="flex flex-col justify-center p-8 md:p-11">
         <span className="self-start rounded-pill bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] px-3 py-1.5 font-heading text-[12px] font-semibold uppercase tracking-[0.05em] text-accent">
