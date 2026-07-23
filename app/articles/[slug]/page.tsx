@@ -7,6 +7,7 @@ import {
   getRelatedPosts,
 } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { slugifyTerm } from "@/lib/slug";
 import { extractToc } from "@/lib/toc";
 import MDXContent from "@/components/mdx/MDXContent";
 import CategoryPill from "@/components/CategoryPill";
@@ -136,10 +137,12 @@ export default async function ArticlePage({
           <article className="min-w-0">
             {/* Header + text share a readable measure */}
             <div className="max-w-[820px]">
-              <CategoryPill
-                category={post.category}
-                className="!text-[12px] !px-[13px] !py-1.5"
-              />
+              <Link href={`/category/${slugifyTerm(post.category)}`}>
+                <CategoryPill
+                  category={post.category}
+                  className="!text-[12px] !px-[13px] !py-1.5"
+                />
+              </Link>
 
               <h1 className="mb-5 mt-[22px] text-balance font-heading text-[32px] font-extrabold leading-[1.12] tracking-[-0.02em] text-text sm:text-[44px]">
                 {post.title}
@@ -191,7 +194,7 @@ export default async function ArticlePage({
                   {post.tags.map((tag) => (
                     <Link
                       key={tag}
-                      href={`/articles?tag=${encodeURIComponent(tag)}`}
+                      href={`/tag/${slugifyTerm(tag)}`}
                       className="rounded-pill border border-border bg-pill px-[13px] py-[7px] font-heading text-[13px] font-medium text-text transition-theme hover:border-accent hover:bg-accent hover:text-white"
                     >
                       {tag}

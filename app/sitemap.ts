@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts, getAllTags } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { slugifyTerm } from "@/lib/slug";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url;
@@ -21,14 +22,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Category filter pages (help search engines discover category clusters).
+  // Dedicated category pages.
   const categoryRoutes: MetadataRoute.Sitemap = siteConfig.categories.map(
     (category) => ({
-      url: `${base}/articles?category=${encodeURIComponent(category)}`,
+      url: `${base}/category/${slugifyTerm(category)}`,
       changeFrequency: "weekly",
-      priority: 0.5,
+      priority: 0.6,
     })
   );
 
-  return [...staticRoutes, ...postRoutes, ...categoryRoutes];
+  // Dedicated tag pages.
+  const tags = await getAllTags();
+  const tagRoutes: MetadataRoute.Sitemap = tags.map((tag) => ({
+    url: `${base}/tag/${slugifyTerm(tag)}`,
+    changeFrequency: "weekly",
+    priority: 0.4,
+  }));
+
+  return [...staticRoutes, ...postRoutes, ...categoryRoutes, ...tagRoutes];
 }

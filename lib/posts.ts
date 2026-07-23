@@ -185,3 +185,17 @@ export async function getAllTags(): Promise<string[]> {
   posts.forEach((p) => p.tags.forEach((t) => set.add(t)));
   return Array.from(set).sort();
 }
+
+/** Published posts in a category (exact match), newest first. */
+export async function getPostsByCategory(
+  category: string
+): Promise<PostMeta[]> {
+  const posts = await getAllPosts();
+  return posts.filter((p) => p.category === category);
+}
+
+/** Published posts carrying a tag (exact match), newest first. */
+export async function getPostsByTag(tag: string): Promise<PostMeta[]> {
+  const posts = await getAllPosts();
+  return posts.filter((p) => p.tags.includes(tag));
+}
