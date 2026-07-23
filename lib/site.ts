@@ -52,7 +52,7 @@ export const siteConfig = {
     },
     {
       label: "Paperskeep on Facebook",
-      href: "https://facebook.com/paperskeep",
+      href: "https://www.facebook.com/profile.php?id=61592541441863",
       short: "f",
     },
   ],
