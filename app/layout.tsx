@@ -36,7 +36,7 @@ const siteJsonLd = [
     url: siteConfig.url,
     logo: {
       "@type": "ImageObject",
-      url: `${siteConfig.url}/icon.svg`,
+      url: `${siteConfig.url}/logo.png`,
     },
     description: siteConfig.description,
     sameAs: siteConfig.social.map((s) => s.href),
@@ -111,6 +111,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
       "max-video-preview": -1,
     },
+  },
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: ["/logo.png"],
+    apple: [{ url: "/logo.png" }],
   },
 };
 
