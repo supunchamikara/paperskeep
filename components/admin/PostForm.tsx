@@ -5,9 +5,10 @@ import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import type { PostRow } from "@/lib/posts";
 import type { ActionResult } from "@/app/admin/actions";
+import { siteConfig } from "@/lib/site";
 import MarkdownToolbar from "./MarkdownToolbar";
 
-const CATEGORIES = ["Technology", "Business", "Lifestyle", "Culture"];
+const CATEGORIES = siteConfig.categories;
 
 type FormAction = (
   prev: ActionResult,

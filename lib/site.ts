@@ -21,7 +21,22 @@ export const siteConfig = {
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],
-  categories: ["Technology", "Business", "Lifestyle", "Culture"] as const,
+  // Single source of truth for categories. Add or remove one here and it
+  // updates the filter pills, the admin post form, and server validation.
+  categories: [
+    "Technology",
+    "Business",
+    "Lifestyle",
+    "Culture",
+    "Science",
+    "Finance",
+    "Design",
+    "Opinion",
+    "Ikigai",
+    "Quotes",
+    "Fashion",
+    "Hair Styles",
+  ] as const,
   // The publication is the byline — articles are credited to Paperskeep itself.
   author: {
     name: "Paperskeep",

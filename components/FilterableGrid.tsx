@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PostMeta } from "@/lib/posts";
+import { siteConfig } from "@/lib/site";
 import PostCard from "./PostCard";
 import PostListItem from "./PostListItem";
 
-const CATEGORIES = ["All", "Technology", "Business", "Lifestyle", "Culture"];
+const CATEGORIES = ["All", ...siteConfig.categories];
 
 type View = "grid" | "list";
 

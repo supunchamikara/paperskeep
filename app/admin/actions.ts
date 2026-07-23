@@ -5,12 +5,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { PostRow } from "@/lib/posts";
+import { siteConfig } from "@/lib/site";
 
 export interface ActionResult {
   error?: string;
 }
 
-const CATEGORIES = ["Technology", "Business", "Lifestyle", "Culture"];
+const CATEGORIES: readonly string[] = siteConfig.categories;
 
 function slugify(input: string): string {
   return input
