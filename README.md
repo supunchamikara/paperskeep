@@ -243,15 +243,9 @@ the admin panel is where you create, edit, publish, and delete them.
 
 ### Admin login
 
-After seeding, sign in at **`/admin/login`**:
-
-| | |
-| --- | --- |
-| **Email** | `admin@paperskeep.blog` |
-| **Password** | `Paperskeep!Admin2026` |
-
-Override the defaults by setting `ADMIN_EMAIL` / `ADMIN_PASSWORD` before seeding.
-To add more admins later, create them in the Supabase Dashboard
+After seeding, sign in at **`/admin/login`** with the credentials you set via
+`ADMIN_EMAIL` / `ADMIN_PASSWORD` before running the seed. To add more admins
+later, create them in the Supabase Dashboard
 (**Authentication → Users → Add user**, with "Auto Confirm").
 
 ### What the admin panel does
