@@ -37,6 +37,7 @@ export interface PostMeta {
   featured: boolean;
   published: boolean;
   date: string;
+  updatedAt: string; // ISO timestamp of the last edit
   readingTime: string; // e.g. "8 min read"
   formattedDate: string; // e.g. "Jul 18, 2026"
 }
@@ -69,6 +70,7 @@ export function mapPost(row: PostRow): Post {
     featured: row.featured,
     published: row.published,
     date: row.date,
+    updatedAt: row.updated_at ?? row.date,
     readingTime: readingTime(row.content || "").text,
     formattedDate: formatDate(row.date),
   };

@@ -12,6 +12,7 @@ import MDXContent from "@/components/mdx/MDXContent";
 import CategoryPill from "@/components/CategoryPill";
 import CoverImage from "@/components/CoverImage";
 import Zoomable from "@/components/Zoomable";
+import JsonLd from "@/components/JsonLd";
 import BrandMark from "@/components/BrandMark";
 import ShareButtons from "@/components/ShareButtons";
 import PostCard from "@/components/PostCard";
@@ -40,6 +41,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     keywords: post.tags,
+    category: post.category,
     alternates: { canonical: url },
     openGraph: {
       type: "article",
@@ -47,7 +49,9 @@ export async function generateMetadata({
       title: post.title,
       description: post.excerpt,
       publishedTime: post.date,
-      authors: [post.author ?? siteConfig.author.name],
+      modifiedTime: post.updatedAt,
+      section: post.category,
+      authors: [siteConfig.name],
       tags: post.tags,
       images: [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }],
     },
@@ -55,6 +59,8 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt,
+      site: siteConfig.twitterHandle,
+      creator: siteConfig.twitterHandle,
       images: [post.coverImage],
     },
   };
@@ -73,28 +79,47 @@ export default async function ArticlePage({
   const byline = siteConfig.name;
   const toc = extractToc(post.content);
 
-  // Article structured data for rich results.
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    image: post.coverImage,
-    datePublished: post.date,
-    author: { "@type": "Organization", name: siteConfig.name },
-    publisher: {
-      "@type": "Organization",
-      name: siteConfig.name,
+  const url = `${siteConfig.url}/articles/${post.slug}`;
+  const wordCount = post.content.trim().split(/\s+/).filter(Boolean).length;
+
+  // Rich structured data: BlogPosting + breadcrumb trail.
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.excerpt,
+      image: [post.coverImage],
+      datePublished: new Date(post.date).toISOString(),
+      dateModified: new Date(post.updatedAt).toISOString(),
+      articleSection: post.category,
+      keywords: post.tags.join(", "),
+      wordCount,
+      inLanguage: "en",
+      author: { "@id": `${siteConfig.url}/#organization` },
+      publisher: { "@id": `${siteConfig.url}/#organization` },
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+      url,
     },
-    mainEntityOfPage: `${siteConfig.url}/articles/${post.slug}`,
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Articles",
+          item: `${siteConfig.url}/articles`,
+        },
+        { "@type": "ListItem", position: 3, name: post.title, item: url },
+      ],
+    },
+  ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <div className="mx-auto w-full max-w-[1500px] px-5 pt-7 sm:px-8 lg:px-12">
         <Link

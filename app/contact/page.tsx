@@ -6,6 +6,7 @@ import SocialIcons from "@/components/SocialIcons";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the Paperskeep team — story tips, feedback, and partnerships.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

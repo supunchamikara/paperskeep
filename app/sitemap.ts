@@ -16,10 +16,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts();
   const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${base}/articles/${post.slug}`,
-    lastModified: new Date(post.date),
+    lastModified: new Date(post.updatedAt),
     changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...postRoutes];
+  // Category filter pages (help search engines discover category clusters).
+  const categoryRoutes: MetadataRoute.Sitemap = siteConfig.categories.map(
+    (category) => ({
+      url: `${base}/articles?category=${encodeURIComponent(category)}`,
+      changeFrequency: "weekly",
+      priority: 0.5,
+    })
+  );
+
+  return [...staticRoutes, ...postRoutes, ...categoryRoutes];
 }

@@ -14,7 +14,7 @@ export const siteConfig = {
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000"),
   locale: "en_US",
-  ogImage: "/og-default.png",
+  twitterHandle: "@paperskeep",
   nav: [
     { label: "Home", href: "/" },
     { label: "Articles", href: "/articles" },

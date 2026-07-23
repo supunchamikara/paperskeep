@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "Paperskeep is a modern publication covering the systems, tools, and people building a more thoughtful internet.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {
