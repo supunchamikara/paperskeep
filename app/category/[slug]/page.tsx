@@ -5,6 +5,7 @@ import { getPostsByCategory } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
 import { slugifyTerm } from "@/lib/slug";
 import PostGrid from "@/components/PostGrid";
+import CategoryNav from "@/components/CategoryNav";
 import JsonLd from "@/components/JsonLd";
 
 export const revalidate = 60;
@@ -94,6 +95,11 @@ export default async function CategoryPage({
           {posts.length} article{posts.length === 1 ? "" : "s"}
         </p>
       </header>
+
+      {/* Browse other categories */}
+      <div className="mb-9">
+        <CategoryNav active={category} />
+      </div>
 
       <PostGrid posts={posts} />
     </div>
