@@ -47,6 +47,21 @@ async function createAdmin() {
 
   if (error) {
     if (/already been registered|already exists/i.test(error.message)) {
+      // Update the existing admin's password to match ADMIN_PASSWORD, so you
+      // can rotate credentials by editing .env.local and re-running the seed.
+      const { data: list } = await supabase.auth.admin.listUsers();
+      const existing = list?.users?.find(
+        (u) => (u.email ?? "").toLowerCase() === ADMIN_EMAIL.toLowerCase()
+      );
+      if (existing) {
+        const { error: updErr } = await supabase.auth.admin.updateUserById(
+          existing.id,
+          { password: ADMIN_PASSWORD, email_confirm: true }
+        );
+        if (updErr) throw updErr;
+        console.log(`✓ Updated password for existing admin: ${ADMIN_EMAIL}`);
+        return;
+      }
       console.log(`• Admin user ${ADMIN_EMAIL} already exists — skipping.`);
       return;
     }
