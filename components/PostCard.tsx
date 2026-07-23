@@ -15,7 +15,7 @@ export default function PostCard({
   compact?: boolean;
 }) {
   return (
-    <article className="hover-lift group overflow-hidden rounded-card border border-border bg-surface shadow-token transition-theme">
+    <article className="hover-lift article-accent-border group overflow-hidden rounded-card border border-border bg-surface shadow-token transition-theme">
       <Link href={`/articles/${post.slug}`} className="block">
         <CoverImage
           src={post.coverImage}

@@ -6,7 +6,7 @@ import CoverImage from "./CoverImage";
 /** Horizontal list-row variant of a post, used by the "list" view. */
 export default function PostListItem({ post }: { post: PostMeta }) {
   return (
-    <article className="group overflow-hidden rounded-card border border-border bg-surface shadow-token transition-theme hover:border-accent">
+    <article className="article-accent-border group overflow-hidden rounded-card border border-border bg-surface shadow-token transition-theme hover:border-accent">
       <Link
         href={`/articles/${post.slug}`}
         className="flex flex-col sm:flex-row"

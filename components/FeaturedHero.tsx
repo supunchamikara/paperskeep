@@ -82,7 +82,7 @@ export default function FeaturedHero({
   if (variant === "split") {
     // Image on the LEFT, text on the right (1:3 ratio); stacks on mobile.
     return (
-      <section className="grid h-full overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme sm:grid-cols-[1fr_3fr]">
+      <section className="article-accent-border grid h-full overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme sm:grid-cols-[1fr_3fr]">
         {cover}
         {Body}
       </section>
@@ -90,7 +90,7 @@ export default function FeaturedHero({
   }
 
   return (
-    <section className="grid overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme md:grid-cols-[1.15fr_0.85fr]">
+    <section className="article-accent-border grid overflow-hidden rounded-hero border border-border bg-surface shadow-token transition-theme md:grid-cols-[1.15fr_0.85fr]">
       {cover}
       {Body}
     </section>

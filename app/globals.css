@@ -77,6 +77,13 @@
   }
 }
 
+/* Accent bottom border for article cards (unlayered so it wins over the
+   default border color utility). */
+.article-accent-border {
+  border-bottom-width: 3px;
+  border-bottom-color: var(--accent);
+}
+
 /* Lightbox fade-in */
 @keyframes lightbox-in {
   from {
