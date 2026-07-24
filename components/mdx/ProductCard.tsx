@@ -85,13 +85,10 @@ export default function ProductCard({
 
   return (
     <div className="my-9 overflow-hidden rounded-block border border-border bg-surface shadow-token transition-theme not-prose">
-      {/* Header + affiliate disclosure */}
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] px-5 py-3">
         <span className="font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-accent">
           Editor&apos;s Pick
-        </span>
-        <span className="font-heading text-[11px] text-muted">
-          #ad · As an Amazon Associate we earn from qualifying purchases
         </span>
       </div>
 
