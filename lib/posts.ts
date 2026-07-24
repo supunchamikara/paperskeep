@@ -158,6 +158,21 @@ export async function getFeaturedPosts(limit = 2): Promise<PostMeta[]> {
 }
 
 /**
+ * The full pool of featured posts for the rotating hero. Returns every post
+ * flagged `featured`, newest first; if fewer than 2 exist, fills with the
+ * newest others so the hero always has at least two to show.
+ */
+export async function getFeaturedPool(): Promise<PostMeta[]> {
+  const posts = await getAllPosts();
+  const featured = posts.filter((p) => p.featured);
+  if (featured.length >= 2) return featured;
+  const fill = posts
+    .filter((p) => !featured.some((f) => f.slug === p.slug))
+    .slice(0, 2 - featured.length);
+  return [...featured, ...fill];
+}
+
+/**
  * Related posts: same category first, then fill with the newest others.
  * Excludes the current post. Returns up to `limit`.
  */

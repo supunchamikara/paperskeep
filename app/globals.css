@@ -97,6 +97,21 @@
   animation: lightbox-in 0.16s ease-out;
 }
 
+/* Featured hero swap fade */
+@keyframes fade-swap {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-swap {
+  animation: fade-swap 0.45s ease;
+}
+
 /* ============================================================
    Long-form article typography (applied to the MDX container).
    ============================================================ */
