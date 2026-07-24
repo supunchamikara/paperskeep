@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { siteConfig } from "@/lib/site";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
+import SearchDialog from "./SearchDialog";
 
 function SearchIcon() {
   return (
@@ -29,6 +30,7 @@ export default function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Elevate the header once the page is scrolled for a layered, "sticky" feel.
   useEffect(() => {
@@ -36,6 +38,18 @@ export default function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // ⌘K / Ctrl+K opens search.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   const isActive = (href: string) =>
@@ -99,13 +113,14 @@ export default function Header() {
 
         {/* Right: actions */}
         <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3.5">
-          <Link
-            href="/articles"
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
             aria-label="Search articles"
             className="flex rounded-full p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <SearchIcon />
-          </Link>
+          </button>
 
           <ThemeToggle />
 
@@ -179,6 +194,8 @@ export default function Header() {
           </ul>
         </nav>
       )}
+
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }
