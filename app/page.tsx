@@ -1,4 +1,4 @@
-import { getAllPosts, getFeaturedPosts, getAllTags } from "@/lib/posts";
+import { getAllPosts, getFeaturedPosts, getPopularTags } from "@/lib/posts";
 import FeaturedHero from "@/components/FeaturedHero";
 import FilterableGrid from "@/components/FilterableGrid";
 import Sidebar from "@/components/Sidebar";
@@ -10,7 +10,7 @@ export default async function HomePage() {
   const [featured, allPosts, tags] = await Promise.all([
     getFeaturedPosts(2),
     getAllPosts(),
-    getAllTags(),
+    getPopularTags(18),
   ]);
 
   // Keep the featured posts out of the grid to avoid duplication.

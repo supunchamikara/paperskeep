@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAllPosts, getAllTags } from "@/lib/posts";
+import { getAllPosts, getPopularTags } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
 import FilterableGrid from "@/components/FilterableGrid";
 import Sidebar from "@/components/Sidebar";
@@ -19,7 +19,7 @@ export default async function ArticlesPage({
 }: {
   searchParams: { category?: string; tag?: string };
 }) {
-  const [posts, tags] = await Promise.all([getAllPosts(), getAllTags()]);
+  const [posts, tags] = await Promise.all([getAllPosts(), getPopularTags(18)]);
 
   const blogJsonLd = {
     "@context": "https://schema.org",

@@ -186,6 +186,19 @@ export async function getAllTags(): Promise<string[]> {
   return Array.from(set).sort();
 }
 
+/** The most-used tags first (for the sidebar cloud), capped to `limit`. */
+export async function getPopularTags(limit = 18): Promise<string[]> {
+  const posts = await getAllPosts();
+  const counts = new Map<string, number>();
+  posts.forEach((p) =>
+    p.tags.forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1))
+  );
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit)
+    .map(([tag]) => tag);
+}
+
 /** Published posts in a category (exact match), newest first. */
 export async function getPostsByCategory(
   category: string
