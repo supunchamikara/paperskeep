@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         <h2>Contact</h2>
         <p>
           Questions about this policy? Email{" "}
-          <a href="mailto:hello@paperskeep.blog">hello@paperskeep.blog</a>.
+          <a href="mailto:hello@paperskeep.com">hello@paperskeep.com</a>.
         </p>
       </div>
     </div>
