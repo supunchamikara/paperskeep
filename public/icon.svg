@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="15" fill="#152232"/>
+  <rect x="1.75" y="1.75" width="60.5" height="60.5" rx="13.25" fill="none" stroke="#2f4258" stroke-width="1.5"/>
+  <!-- teal paper / book stack (bottom-left) -->
+  <g stroke="#37b0a6" stroke-width="3.4" stroke-linecap="round" fill="none">
+    <path d="M13 39 L24 34.5"/>
+    <path d="M13 45 L26 39.7"/>
+    <path d="M13 51 L28 44.9"/>
+  </g>
+  <!-- R monogram -->
+  <text x="37" y="45" text-anchor="middle"
+        font-family="Montserrat, 'Segoe UI', Arial, sans-serif"
+        font-size="37" font-weight="800" fill="#f2f6f5">R</text>
+</svg>

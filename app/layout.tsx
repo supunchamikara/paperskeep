@@ -113,8 +113,13 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    shortcut: ["/logo.png"],
+    // Lightweight SVG for the browser tab + Google; PNG kept as a raster
+    // fallback. The on-site logo still uses /logo.png (unchanged).
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    shortcut: ["/icon.svg"],
     apple: [{ url: "/logo.png" }],
   },
   verification: {
