@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAdminPosts } from "./actions";
+import { paginationRange } from "@/lib/pagination";
 import PostRowActions from "@/components/admin/PostRowActions";
 
 export const metadata: Metadata = {
@@ -151,24 +152,30 @@ export default async function AdminDashboard({
               ←
             </Link>
           )}
-          {Array.from({ length: pageCount }).map((_, i) => {
-            const n = i + 1;
-            const active = n === page;
-            return (
+          {paginationRange(page, pageCount).map((item, i) =>
+            item === "…" ? (
+              <span
+                key={`dots-${i}`}
+                className="flex h-10 w-8 items-center justify-center font-heading text-[14px] text-muted"
+                aria-hidden="true"
+              >
+                …
+              </span>
+            ) : (
               <Link
-                key={n}
-                href={`/admin?page=${n}`}
-                aria-current={active ? "page" : undefined}
+                key={item}
+                href={`/admin?page=${item}`}
+                aria-current={item === page ? "page" : undefined}
                 className={`h-10 min-w-[40px] rounded-[6px] border px-2 text-center font-heading text-[14px] font-semibold leading-[38px] transition-theme ${
-                  active
+                  item === page
                     ? "border-accent bg-accent text-white"
                     : "border-border bg-surface text-text hover:border-accent hover:text-accent"
                 }`}
               >
-                {n}
+                {item}
               </Link>
-            );
-          })}
+            )
+          )}
           {page < pageCount && (
             <Link
               href={`/admin?page=${page + 1}`}

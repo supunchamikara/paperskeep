@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PostMeta } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { paginationRange } from "@/lib/pagination";
 import PostCard from "./PostCard";
 import PostListItem from "./PostListItem";
 
@@ -219,25 +220,31 @@ export default function FilterableGrid({
             ←
           </button>
 
-          {Array.from({ length: pageCount }).map((_, i) => {
-            const n = i + 1;
-            const active = n === currentPage;
-            return (
+          {paginationRange(currentPage, pageCount).map((item, i) =>
+            item === "…" ? (
+              <span
+                key={`dots-${i}`}
+                className="flex h-10 w-8 items-center justify-center font-heading text-[14px] text-muted"
+                aria-hidden="true"
+              >
+                …
+              </span>
+            ) : (
               <button
-                key={n}
+                key={item}
                 type="button"
-                onClick={() => goTo(n)}
-                aria-current={active ? "page" : undefined}
-                className={`h-10 w-10 rounded-[6px] border font-heading text-[14px] font-semibold transition-theme ${
-                  active
+                onClick={() => goTo(item)}
+                aria-current={item === currentPage ? "page" : undefined}
+                className={`h-10 min-w-[40px] rounded-[6px] border px-1 font-heading text-[14px] font-semibold transition-theme ${
+                  item === currentPage
                     ? "border-accent bg-accent text-white"
                     : "border-border bg-surface text-text hover:border-accent hover:text-accent"
                 }`}
               >
-                {n}
+                {item}
               </button>
-            );
-          })}
+            )
+          )}
 
           <button
             type="button"
