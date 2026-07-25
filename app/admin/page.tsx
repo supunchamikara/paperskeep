@@ -68,7 +68,7 @@ export default async function AdminDashboard({
       ) : (
         <div className="overflow-hidden rounded-block border border-border bg-surface shadow-token">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] border-collapse text-left">
+            <table className="w-full min-w-[820px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-border font-heading text-[12px] uppercase tracking-[0.04em] text-muted">
                   <th className="px-5 py-3.5 font-semibold">Title</th>
@@ -126,6 +126,7 @@ export default async function AdminDashboard({
                           slug={post.slug}
                           title={post.title}
                           published={post.published}
+                          featured={post.featured}
                         />
                       </div>
                     </td>

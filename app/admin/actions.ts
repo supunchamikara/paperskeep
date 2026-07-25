@@ -140,6 +140,18 @@ export async function togglePublish(id: string, published: boolean) {
   revalidatePublic((data as { slug?: string } | null)?.slug);
 }
 
+/** Quick feature/unfeature toggle from the dashboard. */
+export async function toggleFeatured(id: string, featured: boolean) {
+  const supabase = createClient(await cookies());
+  const { data } = await supabase
+    .from("posts")
+    .update({ featured })
+    .eq("id", id)
+    .select("slug")
+    .maybeSingle();
+  revalidatePublic((data as { slug?: string } | null)?.slug);
+}
+
 export async function signOut() {
   const supabase = createClient(await cookies());
   await supabase.auth.signOut();
@@ -168,8 +180,9 @@ export async function getAdminPosts(
     supabase
       .from("posts")
       .select("*", { count: "exact" })
-      .order("date", { ascending: false })
+      // Match the public ordering (lib/posts.ts): newest-added first.
       .order("created_at", { ascending: false })
+      .order("date", { ascending: false })
       .range(from, to),
     supabase
       .from("posts")

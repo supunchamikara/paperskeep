@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { useTransition } from "react";
-import { deletePost, togglePublish } from "@/app/admin/actions";
+import { deletePost, toggleFeatured, togglePublish } from "@/app/admin/actions";
 
 export default function PostRowActions({
   id,
   slug,
   title,
   published,
+  featured,
 }: {
   id: string;
   slug: string;
   title: string;
   published: boolean;
+  featured: boolean;
 }) {
   const [pending, startTransition] = useTransition();
 
@@ -41,6 +43,16 @@ export default function PostRowActions({
         className="font-heading text-[13px] font-semibold text-muted hover:text-accent disabled:opacity-50"
       >
         {published ? "Unpublish" : "Publish"}
+      </button>
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => startTransition(() => toggleFeatured(id, !featured))}
+        className={`font-heading text-[13px] font-semibold hover:text-accent disabled:opacity-50 ${
+          featured ? "text-accent" : "text-muted"
+        }`}
+      >
+        {featured ? "Unfeature" : "Feature"}
       </button>
       <button
         type="button"
