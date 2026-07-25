@@ -44,7 +44,7 @@ export default async function ArticlesPage({
       <JsonLd data={blogJsonLd} />
       <header className="mb-8">
         <h1 className="font-heading text-[34px] font-extrabold tracking-[-0.02em] text-text">
-          All Articles
+          Papers &amp; Pieces
         </h1>
         <p className="mt-2 font-body text-[17px] text-muted">
           {posts.length} pieces on technology, business, lifestyle, and culture.
