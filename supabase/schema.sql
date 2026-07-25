@@ -106,6 +106,10 @@ create table if not exists public.posts (
 create index if not exists posts_published_date_idx
   on public.posts (published, date desc);
 
+-- Public listings sort newest-added first, so index that ordering too.
+create index if not exists posts_published_created_at_idx
+  on public.posts (published, created_at desc);
+
 -- Keep updated_at fresh on every update.
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$

@@ -78,7 +78,12 @@ export function mapPost(row: PostRow): Post {
 
 const stripContent = ({ content, ...meta }: Post): PostMeta => meta;
 
-/** All published posts, newest first. Returns [] if Supabase isn't ready. */
+/**
+ * All published posts, most recently added first. `created_at` leads the sort
+ * (not `date`) so a freshly added post always lands on top, even when it's
+ * backdated — `date` is a date-only column and would otherwise bury it.
+ * Returns [] if Supabase isn't ready.
+ */
 export async function getAllPosts(): Promise<PostMeta[]> {
   try {
     const supabase = createPublicClient();
@@ -86,8 +91,8 @@ export async function getAllPosts(): Promise<PostMeta[]> {
       .from("posts")
       .select("*")
       .eq("published", true)
-      .order("date", { ascending: false })
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .order("date", { ascending: false });
 
     if (error) {
       console.error("getAllPosts:", error.message);
