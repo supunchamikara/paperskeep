@@ -20,7 +20,7 @@ export default function NearestStrip({
 
   return (
     <div className={className}>
-      <p className="mb-2 px-1 font-heading text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+      <p className="mb-1.5 px-1 font-heading text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted sm:text-[11px]">
         Nearest other stations
       </p>
       <ul className="flex gap-3 overflow-x-auto pb-1">
@@ -29,16 +29,16 @@ export default function NearestStrip({
             <button
               type="button"
               onClick={() => onSelect(s.id)}
-              className="flex h-full w-[220px] flex-col items-start gap-1 rounded-card border border-border bg-surface px-3.5 py-3 text-left shadow-token transition-colors hover:border-accent"
+              className="flex h-full w-[168px] flex-col items-start gap-0.5 rounded-card border border-border bg-surface px-3 py-2.5 text-left shadow-token transition-colors hover:border-accent sm:w-[220px] sm:gap-1 sm:px-3.5 sm:py-3"
             >
-              <span className="font-heading text-[14px] font-semibold leading-tight text-text line-clamp-2">
+              <span className="font-heading text-[13px] font-semibold leading-tight text-text line-clamp-1 sm:text-[14px] sm:line-clamp-2">
                 {s.station_name}
               </span>
               <span className="font-heading text-[12.5px] font-semibold text-accent">
                 {formatKm(s.distanceKm)}
               </span>
               {s.connector_types && (
-                <span className="text-[12px] leading-snug text-muted line-clamp-1">
+                <span className="hidden text-[12px] leading-snug text-muted line-clamp-1 sm:block">
                   {s.connector_types}
                 </span>
               )}

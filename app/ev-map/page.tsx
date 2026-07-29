@@ -137,13 +137,13 @@ export default async function EvMapPage() {
       {/* The map is client-only; this heading is what a crawler reads first. */}
       <h1 className="sr-only">{TITLE}</h1>
 
-      {/* 72px is the unscrolled header height (see components/Header.tsx). The
-          vh class is the fallback; browsers that understand dvh take the inline
-          value and stay correct under mobile browser chrome. */}
-      <div
-        className="w-full [height:calc(100vh-72px)]"
-        style={{ height: "calc(100dvh - 72px)" }}
-      >
+      {/* 72px is the unscrolled header height (see components/Header.tsx).
+          On mobile the map stops ~76px short of the fold: a full-viewport map
+          leaves no non-map area to drag, so touch scrolling only pans the map
+          and the directory below is unreachable. The peek doubles as the
+          affordance that there is more page. Desktop keeps the full height —
+          a mouse wheel outside the map scrolls fine. */}
+      <div className="w-full [height:calc(100dvh-148px)] md:[height:calc(100dvh-72px)]">
         <EvMapClient stations={stations.filter(hasCoords)} />
       </div>
 

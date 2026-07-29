@@ -30,14 +30,17 @@ export default function StationDetail({
   const isActive = (station.status ?? "").toLowerCase() === "active";
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-start gap-3 border-b border-border px-5 py-4">
+    // flex-1 rather than h-full: inside the mobile sheet this sits next to the
+    // nearest-stations strip, and h-full would claim the whole sheet and push
+    // the strip out past the clip.
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex shrink-0 items-start gap-3 border-b border-border px-4 py-3.5 sm:px-5 sm:py-4">
         <div className="min-w-0 flex-1">
-          <h2 className="font-heading text-[19px] font-bold leading-tight text-text">
+          <h2 className="font-heading text-[17.5px] font-bold leading-tight text-text sm:text-[19px]">
             {station.station_name}
           </h2>
           {station.operator_network && (
-            <p className="mt-1 text-[13.5px] text-muted">{station.operator_network}</p>
+            <p className="mt-0.5 text-[13.5px] text-muted">{station.operator_network}</p>
           )}
         </div>
         <button
@@ -53,7 +56,7 @@ export default function StationDetail({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3.5 sm:px-5 sm:py-4">
         <span
           className={`pill px-2.5 py-1 text-[11px] uppercase tracking-[0.06em] ${
             isActive
@@ -93,7 +96,7 @@ export default function StationDetail({
       </div>
 
       {directions && (
-        <div className="border-t border-border px-5 py-4">
+        <div className="shrink-0 border-t border-border px-4 py-3 sm:px-5 sm:py-4">
           <a
             href={directions}
             target="_blank"

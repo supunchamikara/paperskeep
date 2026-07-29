@@ -1,5 +1,6 @@
 import type { EvStation } from "@/lib/ev";
 import { directionsUrl, hasCoords } from "@/lib/ev";
+import DirectoryCollapse from "./DirectoryCollapse";
 
 /**
  * Server-rendered directory of every station, grouped by district.
@@ -26,7 +27,7 @@ export default function StationDirectory({ stations }: { stations: EvStation[] }
     <section
       id="station-directory"
       aria-labelledby="directory-heading"
-      className="mx-auto max-w-container px-5 py-14 sm:px-8 lg:px-12"
+      className="mx-auto max-w-container scroll-mt-20 px-5 py-10 sm:px-8 sm:py-14 lg:px-12"
     >
       <h2
         id="directory-heading"
@@ -41,7 +42,8 @@ export default function StationDirectory({ stations }: { stations: EvStation[] }
         street or area — check the address before travelling.
       </p>
 
-      <div className="mt-10 grid gap-x-10 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
+      <DirectoryCollapse count={stations.length}>
+        <div className="mt-8 grid gap-x-10 gap-y-9 sm:mt-10 md:grid-cols-2 xl:grid-cols-3">
         {districts.map(([district, list]) => (
           <div key={district}>
             <h3 className="border-b border-border pb-2 font-heading text-[15px] font-bold uppercase tracking-[0.06em] text-text">
@@ -95,8 +97,9 @@ export default function StationDirectory({ stations }: { stations: EvStation[] }
                 })}
             </ul>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </DirectoryCollapse>
     </section>
   );
 }
