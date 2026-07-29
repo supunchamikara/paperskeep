@@ -18,6 +18,7 @@ export const siteConfig = {
   nav: [
     { label: "Home", href: "/" },
     { label: "Articles", href: "/articles" },
+    { label: "EV Map", href: "/ev-map" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],

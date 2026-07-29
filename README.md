@@ -271,6 +271,137 @@ later, create them in the Supabase Dashboard
 
 ---
 
+## EV Map (`/ev-map`)
+
+A full-viewport Leaflet map of Sri Lanka's EV charging stations, backed by the
+`public.ev_stations` table. Tiles come from OpenStreetMap — **no API key, paid
+or otherwise**. Clicking a marker slides in a detail pane, flies the map to the
+station, and lists the five nearest other stations along the bottom.
+
+| File | Role |
+| --- | --- |
+| `supabase/ev_stations.sql` | Standalone, idempotent migration (also in `schema.sql`) |
+| `scripts/seed-ev-stations.mjs` | CSV → Supabase importer, upserts on `station_id` |
+| `app/ev-map/page.tsx` | Server route; fetches active stations, sets page height |
+| `components/ev/EvMapClient.tsx` | `dynamic(..., { ssr: false })` boundary — Leaflet is client-only |
+| `components/ev/EvMap.tsx` | Map, clustered markers, selection state, fly-to |
+| `components/ev/StationDetail.tsx` | Sliding pane (left rail on desktop, bottom sheet on mobile) |
+| `components/ev/NearestStrip.tsx` | Scrollable nearest-station cards |
+| `lib/ev.ts` | Types + `haversineKm` / `nearestStations` (pure, testable) |
+
+### One-time setup
+
+1. Run `supabase/ev_stations.sql` in the Supabase SQL Editor (or re-run the whole
+   `supabase/schema.sql` — every statement is `if not exists` / `drop … if exists`,
+   including the `alter table … add column if not exists geo_precision` needed by
+   databases created before that column was introduced).
+2. Import the data: `npm run db:seed:ev`
+
+If `geo_precision` is missing the seed still imports everything else and prints
+the exact `alter table` to run — re-run the seed afterwards to record it.
+
+### Re-importing when a new phase adds rows
+
+The importer **upserts on `station_id`**, so it is safe to run as often as you
+like: existing stations are refreshed in place and new `SL-####` rows are
+appended. Nothing is ever deleted.
+
+```bash
+# 1. Drop the new rows into the CSV (same headers), then:
+npm run db:seed:ev
+
+# Check the parse without touching the database:
+node scripts/seed-ev-stations.mjs --dry-run
+
+# Import a different file (e.g. a phase-2 export):
+node --env-file=.env.local scripts/seed-ev-stations.mjs data/phase-2.csv
+```
+
+Rows with a blank `latitude`/`longitude` **do** import — they just can't be
+drawn yet. The script prints them at the end so they can be queued for
+geocoding. (178 rows load; 169 have coordinates, 9 do not.) Coverage spans all
+21 districts that appear in the data, across all 9 provinces.
+
+### Data sources & coordinate precision
+
+| Source | Rows | Licence |
+| --- | --- | --- |
+| `johnkeellscgauto.com/charger-network` (JKCG BYD Network) | 128 | operator-published |
+| OpenStreetMap `amenity=charging_station`, island-wide | 49 | ODbL |
+| chargeNET (from the original CSV) | 1 | operator-published |
+
+11 operator networks are represented. Operator spellings are normalised
+(`Green Frontiers Network` / `Green Frontier` -> `Green Frontiers`,
+`Electricity board` -> `Ceylon Electricity Board`), and OSM's misspelled
+`ChergeNET` is corrected to `chargeNET`.
+
+Coordinates are not uniformly trustworthy, so every row carries a
+**`geo_precision`** flag:
+
+- **`exact`** — from the operator, or a mapped OSM POI. Safe to navigate to.
+- **`approximate`** — geocoded (Nominatim) to the street or area only, so the
+  pin can be a few hundred metres off. These render as **hollow pins** and the
+  detail pane shows an "Approximate location" warning.
+
+Never backfill `approximate` rows by silently promoting them to `exact` — a
+charging map that sends someone to the wrong forecourt is worse than one that
+admits it doesn't know. Upgrade a row only when the operator publishes real
+coordinates or the site is mapped in OSM.
+
+Two-wheeler-only points (Ather Grid, 3 kW Type 7) are deliberately excluded, as
+listing them beside CCS2 car chargers would mislead.
+
+Geocoding rejects anchors that land on a district boundary centroid, a mountain
+peak, or an unrelated house — all of which are "in the right district" and
+useless as a charger pin. A coarse anchor is still used to decide *which*
+branch of a chain a row means, just never as the pin itself. Rows that survive
+none of that keep blank coordinates rather than getting a plausible guess.
+
+**Known limitation:** chargeNET, the largest network in Sri Lanka (600+
+chargers by their own claim), publishes no machine-readable station list — the
+locator is app-gated and OpenChargeMap now requires a paid API key. Until one
+of those opens up, that network is represented only by the handful of sites
+volunteers have mapped in OSM, and the dataset should not be read as complete.
+
+### SEO
+
+The map is `ssr: false`, so a crawler would otherwise see an empty `<div>`.
+`components/ev/StationDirectory.tsx` server-renders every station below the map,
+grouped by district with real headings and directions links — genuine indexable
+content, not hidden keyword text. On top of that the route ships an `ItemList`
+of `schema.org/EVChargingStation` (each with its own `GeoCoordinates`) plus a
+`BreadcrumbList`, an `sr-only` `<h1>`, a canonical URL, OG/Twitter tags, a
+generated share image (`app/ev-map/opengraph-image.tsx`, station count baked
+in), a `sitemap.xml` entry and an `llms.txt` line.
+
+Note the page weighs ~500 kB because the full dataset appears three times: the
+map props, the directory markup and the JSON-LD. If it grows much past this,
+trim the JSON-LD to the top N stations before trimming the directory — the
+directory is what users and crawlers actually read.
+
+### Statistics
+
+`/admin/stats` has an **EV map dataset** section (`lib/ev-stats.ts`) showing
+total vs mappable stations, how many pins are approximate, how many still lack
+coordinates, and the breakdown by district and operator. It reads through the
+public client, so it reflects exactly what the map sees. When `geo_precision`
+is missing from the table the panel says so rather than reporting every pin as
+exact.
+
+### Scaling past a few thousand stations
+
+The page deliberately fetches every active station once and does the
+nearest-neighbour search in the browser — cheaper than per-pan round trips at
+this size. Two `TODO(scale)` comments mark where that flips:
+
+- `app/ev-map/page.tsx` — swap the fetch-all for a bounds-filtered query, driven
+  by the map's `moveend` (the hook site is `FlyToSelected` in `EvMap.tsx`), using
+  the `ev_stations_geo_idx` index on `(latitude, longitude)`.
+- `lib/ev.ts` — move `nearestStations` to a Supabase RPC over PostGIS/`earthdistance`
+  (`ST_DWithin`, or `<->` KNN ordering) instead of the client-side haversine scan.
+
+---
+
 ## Notes
 
 - All images use `next/image`. Remote hosts are allow-listed in `next.config.mjs`

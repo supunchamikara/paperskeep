@@ -8,23 +8,28 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:seed": "node --env-file=.env.local scripts/seed.mjs"
+    "db:seed": "node --env-file=.env.local scripts/seed.mjs",
+    "db:seed:ev": "node --env-file=.env.local scripts/seed-ev-stations.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.8",
     "gray-matter": "^4.0.3",
+    "leaflet": "^1.9.4",
     "next": "^14.2.35",
     "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-cluster": "^2.1.0",
     "reading-time": "^1.5.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0",
     "stripe": "^22.3.2"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

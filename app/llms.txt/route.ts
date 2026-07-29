@@ -26,6 +26,7 @@ export async function GET() {
     "## Pages",
     `- [Home](${base}/): Featured and recent articles.`,
     `- [Articles](${base}/articles): All articles, filterable by category and tag.`,
+    `- [EV Map](${base}/ev-map): Interactive map and full directory of electric-vehicle charging stations across Sri Lanka, by district, operator and connector type.`,
     `- [About](${base}/about): About ${siteConfig.name}.`,
     `- [Contact](${base}/contact): Get in touch.`,
     "",
