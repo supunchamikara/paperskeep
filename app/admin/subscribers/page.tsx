@@ -6,6 +6,7 @@ import {
   deleteMessage,
 } from "../actions";
 import DeleteInline from "@/components/admin/DeleteInline";
+import MessageView from "@/components/admin/MessageView";
 
 export const metadata: Metadata = {
   title: "Subscribers & Messages",
@@ -84,9 +85,12 @@ export default async function SubscribersPage() {
                     />
                   </div>
                 </div>
-                <p className="mt-2 whitespace-pre-wrap font-body text-[14.5px] leading-[1.6] text-text">
-                  {m.message}
-                </p>
+                <MessageView
+                  name={m.name ?? "Anonymous"}
+                  email={m.email}
+                  message={m.message}
+                  date={formatDate(m.created_at)}
+                />
               </li>
             ))}
           </ul>

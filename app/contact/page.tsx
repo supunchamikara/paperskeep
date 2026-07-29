@@ -30,14 +30,12 @@ export default function ContactPage() {
         <aside className="flex flex-col gap-6">
           <div className="rounded-card border border-border bg-surface p-6 shadow-token transition-theme">
             <h4 className="mb-3 font-heading text-[13px] font-bold uppercase tracking-[0.05em] text-muted">
-              Email
+              Say hello
             </h4>
-            <a
-              href="mailto:hello@paperskeep.com"
-              className="font-body text-[16px] text-accent hover:text-accent-strong"
-            >
-              hello@paperskeep.com
-            </a>
+            <p className="font-body text-[16px] leading-[1.55] text-muted">
+              We&apos;d love to hear from you. Use the form and we&apos;ll get
+              back to you at the address you leave.
+            </p>
           </div>
           <div className="rounded-card border border-border bg-surface p-6 shadow-token transition-theme">
             <h4 className="mb-3 font-heading text-[13px] font-bold uppercase tracking-[0.05em] text-muted">
@@ -50,11 +48,9 @@ export default function ContactPage() {
               Press &amp; partnerships
             </h4>
             <p className="font-body text-[14px] leading-[1.55] text-white/[0.66]">
-              For media inquiries, reach the {siteConfig.name} team directly at{" "}
-              <a href="mailto:press@paperskeep.com" className="text-accent">
-                press@paperskeep.com
-              </a>
-              .
+              For media inquiries, send the {siteConfig.name} team a note using
+              the form — mark it “Press” and we&apos;ll route it to the right
+              person.
             </p>
           </div>
         </aside>
