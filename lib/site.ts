@@ -1,4 +1,34 @@
 /**
+ * A primary navigation entry. Items with `children` render as a dropdown in
+ * the header — the parent link still navigates to its own landing page.
+ */
+export type NavItem = {
+  label: string;
+  href: string;
+  children?: { label: string; href: string; description: string }[];
+};
+
+const nav: NavItem[] = [
+  { label: "Home", href: "/" },
+  { label: "Articles", href: "/articles" },
+  { label: "EV Map", href: "/ev-map" },
+  {
+    label: "Tools",
+    href: "/tools",
+    // Add new tools here and they appear in the dropdown and the /tools index.
+    children: [
+      {
+        label: "EPUB Studio",
+        href: "/tools/epub-studio",
+        description: "KDP-optimized EPUB creator",
+      },
+    ],
+  },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+/**
  * Central site configuration — used for SEO metadata, RSS, sitemap,
  * the header/footer, and the author sidebar.
  */
@@ -15,13 +45,7 @@ export const siteConfig = {
       : "http://localhost:3000"),
   locale: "en_US",
   twitterHandle: "@paperskeep",
-  nav: [
-    { label: "Home", href: "/" },
-    { label: "Articles", href: "/articles" },
-    { label: "EV Map", href: "/ev-map" },
-    { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
-  ],
+  nav,
   // Single source of truth for categories. Add or remove one here and it
   // updates the filter pills, the admin post form, and server validation.
   categories: [

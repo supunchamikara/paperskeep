@@ -10,6 +10,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/`, changeFrequency: "daily", priority: 1 },
     { url: `${base}/articles`, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/ev-map`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${base}/tools`, changeFrequency: "monthly", priority: 0.6 },
+    {
+      url: `${base}/tools/epub-studio`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     { url: `${base}/about`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${base}/contact`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.3 },

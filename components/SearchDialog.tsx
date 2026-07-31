@@ -12,6 +12,8 @@ interface Item {
   tags: string[];
   date: string;
   readingTime: string;
+  /** Set for non-article destinations (tools, maps); posts resolve by slug. */
+  href?: string;
 }
 
 /** Relevance score for a post against the query. Higher = closer match. */
@@ -94,7 +96,7 @@ export default function SearchDialog({
   useEffect(() => setActive(0), [q]);
 
   function go(item: Item) {
-    router.push(`/articles/${item.slug}`);
+    router.push(item.href ?? `/articles/${item.slug}`);
     onClose();
     setQ("");
   }
@@ -134,8 +136,8 @@ export default function SearchDialog({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Search articles…"
-            aria-label="Search articles"
+            placeholder="Search articles and tools…"
+            aria-label="Search articles and tools"
             className="w-full bg-transparent py-4 font-body text-[16px] text-text outline-none placeholder:text-muted"
           />
           <button
@@ -152,7 +154,7 @@ export default function SearchDialog({
         <div className="max-h-[60vh] overflow-y-auto">
           {q.trim() === "" ? (
             <p className="px-4 py-8 text-center font-body text-[14px] text-muted">
-              Type to search articles by title, tag, or category.
+              Type to search articles and tools by title, tag, or category.
             </p>
           ) : results.length === 0 ? (
             <p className="px-4 py-8 text-center font-body text-[14px] text-muted">

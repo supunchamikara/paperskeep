@@ -8,6 +8,25 @@ import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import SearchDialog from "./SearchDialog";
 
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
 function SearchIcon() {
   return (
     <svg
@@ -31,6 +50,9 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Which nav dropdown is open, keyed by label. Hover opens it; focus keeps it
+  // open for keyboard users; Escape and navigation close it.
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   // Elevate the header once the page is scrolled for a layered, "sticky" feel.
   useEffect(() => {
@@ -40,17 +62,24 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // ⌘K / Ctrl+K opens search.
+  // ⌘K / Ctrl+K opens search; Escape closes an open dropdown.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSearchOpen(true);
       }
+      if (e.key === "Escape") setOpenMenu(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  // Landing on a new page should never leave a menu hanging open.
+  useEffect(() => {
+    setOpenMenu(null);
+    setMenuOpen(false);
+  }, [pathname]);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -90,16 +119,20 @@ export default function Header() {
         >
           {siteConfig.nav.map((item) => {
             const active = isActive(item.href);
-            return (
+            const open = openMenu === item.label;
+
+            const link = (
               <Link
-                key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex items-center px-3.5 transition-colors ${
+                aria-haspopup={item.children ? "true" : undefined}
+                aria-expanded={item.children ? open : undefined}
+                className={`relative flex items-center gap-1.5 px-3.5 transition-colors ${
                   active ? "text-white" : "text-white/65 hover:text-white"
                 }`}
               >
                 {item.label}
+                {item.children && <ChevronIcon open={open} />}
                 {/* active underline indicator */}
                 <span
                   className={`absolute inset-x-3 bottom-0 h-[2px] rounded-full bg-accent transition-opacity duration-200 ${
@@ -107,6 +140,82 @@ export default function Header() {
                   }`}
                 />
               </Link>
+            );
+
+            if (!item.children) {
+              return <div key={item.href} className="flex">{link}</div>;
+            }
+
+            return (
+              <div
+                key={item.href}
+                className="relative flex"
+                onMouseEnter={() => setOpenMenu(item.label)}
+                onMouseLeave={() => setOpenMenu(null)}
+                // Keyboard users get the same panel: it opens when focus lands
+                // inside and closes once focus leaves the group entirely.
+                onFocus={() => setOpenMenu(item.label)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setOpenMenu(null);
+                  }
+                }}
+              >
+                {link}
+
+                {/* The panel sits flush against the header's bottom edge so
+                    there is no dead gap to cross with the pointer. */}
+                <div
+                  className={`absolute left-0 top-full z-50 w-[288px] pt-2 transition-all duration-200 ${
+                    open
+                      ? "visible translate-y-0 opacity-100"
+                      : "invisible -translate-y-1 opacity-0"
+                  }`}
+                >
+                  {/* Opaque on purpose. The theme colors are CSS variables,
+                      so Tailwind's `/95` opacity modifier silently generates
+                      no rule for them — and a translucent panel over article
+                      artwork is unreadable anyway. */}
+                  <div className="overflow-hidden rounded-[10px] border border-white/10 bg-navy p-1.5 shadow-[0_18px_44px_rgba(2,6,23,0.5)]">
+                    <ul>
+                      {item.children.map((child) => {
+                        const childActive = pathname === child.href;
+                        return (
+                          <li key={child.href}>
+                            <Link
+                              href={child.href}
+                              aria-current={childActive ? "page" : undefined}
+                              className={`block rounded-[7px] px-3 py-2.5 transition-colors ${
+                                childActive ? "bg-white/10" : "hover:bg-white/10"
+                              }`}
+                            >
+                              <span
+                                className={`block text-[14px] font-semibold ${
+                                  childActive ? "text-accent" : "text-white"
+                                }`}
+                              >
+                                {child.label}
+                              </span>
+                              <span className="mt-0.5 block text-[12px] font-normal leading-snug text-white/55">
+                                {child.description}
+                              </span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    <div className="mx-3 my-1.5 h-px bg-white/10" />
+
+                    <Link
+                      href={item.href}
+                      className="block rounded-[7px] px-3 py-2 text-[12.5px] font-semibold text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                      Browse all {item.label.toLowerCase()} →
+                    </Link>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </nav>
@@ -180,6 +289,31 @@ export default function Header() {
                 >
                   {item.label}
                 </Link>
+
+                {/* Sub-items are always visible on mobile: there is no hover
+                    to reveal them, and the list is short. */}
+                {item.children && (
+                  <ul className="mb-1 ml-3 border-l border-white/10 pl-3">
+                    {item.children.map((child) => (
+                      <li key={child.href}>
+                        <Link
+                          href={child.href}
+                          onClick={() => setMenuOpen(false)}
+                          aria-current={
+                            pathname === child.href ? "page" : undefined
+                          }
+                          className={`block rounded-[7px] px-3 py-2.5 font-heading text-[14.5px] font-medium transition-colors ${
+                            pathname === child.href
+                              ? "bg-white/10 text-accent"
+                              : "text-white/60 hover:bg-white/5 hover:text-white"
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
             <li>
