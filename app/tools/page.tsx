@@ -42,6 +42,7 @@ const tools = [
     tagline: "KDP-optimized EPUB creator",
     description:
       "Write or paste your novel in a light markup, watch a live Kindle-style preview, set metadata, styling and a cover, then export a valid EPUB 3 file. Runs entirely in your browser.",
+    guideHref: "/tools/epub-studio/guide",
   },
 ];
 
@@ -105,11 +106,11 @@ export default function ToolsPage() {
 
       <ul className="grid gap-5">
         {tools.map((tool) => (
-          <li key={tool.href}>
-            <Link
-              href={tool.href}
-              className="block rounded-card border border-border bg-surface p-6 shadow-token transition-theme hover-lift"
-            >
+          <li
+            key={tool.href}
+            className="rounded-card border border-border bg-surface p-6 shadow-token transition-theme"
+          >
+            <Link href={tool.href} className="block">
               <span className="font-heading text-[11.5px] font-semibold uppercase tracking-[0.07em] text-accent">
                 {tool.tagline}
               </span>
@@ -120,6 +121,18 @@ export default function ToolsPage() {
                 {tool.description}
               </p>
             </Link>
+
+            <div className="mt-4 flex flex-wrap items-center gap-4 font-heading text-[14px] font-semibold">
+              <Link href={tool.href} className="text-accent hover:text-accent-strong">
+                Open {tool.name} →
+              </Link>
+              <Link
+                href={tool.guideHref}
+                className="text-muted underline underline-offset-[3px] hover:text-accent"
+              >
+                Read the guide
+              </Link>
+            </div>
           </li>
         ))}
       </ul>

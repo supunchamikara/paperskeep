@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
-import EpubStudioGuide from "@/components/tools/EpubStudioGuide";
 import {
   EPUB_STUDIO_NAME,
-  faqs,
   features,
-  steps,
 } from "@/components/tools/epubStudioContent";
 import { siteConfig } from "@/lib/site";
 import EpubStudio from "./EpubStudio";
 
 const TITLE = "EPUB Studio — KDP-Optimized EPUB Creator";
 const DESCRIPTION =
-  "Free browser-based EPUB 3 creator for Kindle Direct Publishing. Write or paste your novel, style the chapters, add a cover, and export a KDP-ready ebook. Nothing is uploaded — it all runs on your machine.";
+  "Free browser-based EPUB 3 creator for Kindle Direct Publishing. Write your novel, style it, add a cover and export a KDP-ready ebook. Nothing is uploaded.";
 
 const URL = `${siteConfig.url}/tools/epub-studio`;
 
@@ -56,9 +53,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * Structured data. Everything here is derived from the copy rendered by
- * <EpubStudioGuide />, so the markup and the visible page always agree —
- * Google penalises FAQ and HowTo schema that isn't on the page.
+ * Structured data for the tool itself. The HowTo and FAQPage blocks live on
+ * /tools/epub-studio/guide alongside the copy they describe.
  */
 function buildJsonLd() {
   return [
@@ -84,31 +80,8 @@ function buildJsonLd() {
       },
       publisher: { "@id": `${siteConfig.url}/#organization` },
       inLanguage: "en",
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "HowTo",
-      name: "How to create an EPUB for Kindle Direct Publishing",
-      description:
-        "Turn a manuscript into a KDP-ready EPUB 3 file using EPUB Studio, entirely in the browser.",
-      totalTime: "PT20M",
-      tool: { "@type": "HowToTool", name: EPUB_STUDIO_NAME },
-      step: steps.map((s, i) => ({
-        "@type": "HowToStep",
-        position: i + 1,
-        name: s.title,
-        text: s.body,
-        url: `${URL}#step-${i + 1}`,
-      })),
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faqs.map((f) => ({
-        "@type": "Question",
-        name: f.q,
-        acceptedAnswer: { "@type": "Answer", text: f.a },
-      })),
+      // Points crawlers at the documentation now that it has its own page.
+      softwareHelp: { "@id": `${URL}/guide#article` },
     },
     {
       "@context": "https://schema.org",
@@ -137,7 +110,6 @@ export default function EpubStudioPage() {
       <h1 className="sr-only">{TITLE}</h1>
 
       <EpubStudio />
-      <EpubStudioGuide />
     </>
   );
 }

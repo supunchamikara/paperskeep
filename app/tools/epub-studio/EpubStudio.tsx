@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
@@ -15,6 +16,7 @@ import {
   CheckCircle,
   Heading1,
   Heading2,
+  HelpCircle,
   Image as ImageIcon,
   Italic,
   Plus,
@@ -781,6 +783,19 @@ export default function EpubStudio() {
               <span>{exportStatus.message}</span>
             </div>
           )}
+
+          {/* New tab on purpose: the workspace holds unsaved keystrokes that
+              the autosave debounce may not have flushed yet, and losing them
+              to a navigation would be the worst thing this button could do. */}
+          <Link
+            href="/tools/epub-studio/guide"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-help"
+          >
+            <HelpCircle size={15} aria-hidden="true" />
+            Help
+          </Link>
 
           <button
             type="button"

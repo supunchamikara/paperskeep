@@ -8,33 +8,62 @@ import {
 } from "./epubStudioContent";
 
 /**
- * Server-rendered copy that sits beneath the EPUB Studio workspace.
+ * The EPUB Studio documentation, rendered at /tools/epub-studio/guide.
  *
- * The tool itself is a client app whose text lives in inputs and canvases —
- * effectively invisible to a crawler. This section is what search engines and
- * AI assistants actually read, and it doubles as the tool's documentation.
+ * It lives on its own page rather than under the workspace: the tool is a
+ * full-height three-pane app that owns the viewport, and burying the manual
+ * below it meant nobody scrolled to it. This is also the page search engines
+ * and AI assistants actually read — the tool itself is a client app whose text
+ * lives in inputs and is invisible to a crawler.
  */
 export default function EpubStudioGuide() {
   return (
-    <div className="border-t border-border bg-bg">
+    <div className="bg-bg">
       <div className="mx-auto max-w-[880px] px-5 py-16 sm:px-8">
+        {/* Visible trail mirroring the BreadcrumbList schema — it gives the
+            page an exit upward and reinforces the hierarchy for crawlers. */}
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex flex-wrap items-center gap-2 font-heading text-[13px] text-muted">
+            <li>
+              <Link href="/tools" className="hover:text-accent">
+                Tools
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link href="/tools/epub-studio" className="hover:text-accent">
+                EPUB Studio
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li className="text-text">Guide</li>
+          </ol>
+        </nav>
+
         {/* Intro */}
         <span className="inline-block rounded-pill bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] px-3 py-1.5 font-heading text-[12px] font-semibold uppercase tracking-[0.05em] text-accent">
           Free browser tool
         </span>
 
-        <h2 className="mb-5 mt-5 text-balance font-heading text-[32px] font-extrabold leading-[1.15] tracking-[-0.02em] text-text sm:text-[36px]">
+        <h1 className="mb-5 mt-5 text-balance font-heading text-[32px] font-extrabold leading-[1.15] tracking-[-0.02em] text-text sm:text-[38px]">
           Turn your manuscript into a KDP-ready EPUB
-        </h2>
+        </h1>
 
-        <p className="mb-12 text-[18px] leading-[1.75] text-muted">
+        <p className="mb-8 text-[18px] leading-[1.75] text-muted">
           {EPUB_STUDIO_INTRO}
         </p>
 
+        <Link
+          href="/tools/epub-studio"
+          className="mb-12 inline-block rounded-[7px] bg-accent px-[18px] py-2.5 font-heading text-[14px] font-semibold text-white shadow-[0_2px_10px_rgba(44,140,135,0.35)] transition-all hover:-translate-y-px hover:bg-accent-strong"
+        >
+          Open EPUB Studio
+        </Link>
+
         {/* Features */}
-        <h3 className="mb-6 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
+        <h2 className="mb-6 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
           What EPUB Studio does
-        </h3>
+        </h2>
 
         <ul className="mb-14 grid gap-4 sm:grid-cols-2">
           {features.map((feature) => (
@@ -42,9 +71,9 @@ export default function EpubStudioGuide() {
               key={feature.title}
               className="rounded-card border border-border bg-surface p-5 shadow-token transition-theme"
             >
-              <h4 className="mb-1.5 font-heading text-[15.5px] font-bold text-text">
+              <h3 className="mb-1.5 font-heading text-[15.5px] font-bold text-text">
                 {feature.title}
-              </h4>
+              </h3>
               <p className="text-[14.5px] leading-[1.6] text-muted">
                 {feature.body}
               </p>
@@ -53,9 +82,9 @@ export default function EpubStudioGuide() {
         </ul>
 
         {/* How to */}
-        <h3 className="mb-6 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
+        <h2 className="mb-6 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
           How to create an EPUB for Kindle Direct Publishing
-        </h3>
+        </h2>
 
         <ol className="mb-14 grid gap-5">
           {steps.map((step, i) => (
@@ -67,9 +96,9 @@ export default function EpubStudioGuide() {
                 {i + 1}
               </span>
               <div>
-                <h4 className="mb-1 font-heading text-[16.5px] font-bold text-text">
+                <h3 className="mb-1 font-heading text-[16.5px] font-bold text-text">
                   {step.title}
-                </h4>
+                </h3>
                 <p className="text-[15.5px] leading-[1.65] text-muted">
                   {step.body}
                 </p>
@@ -79,9 +108,9 @@ export default function EpubStudioGuide() {
         </ol>
 
         {/* Markup reference */}
-        <h3 className="mb-3 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
+        <h2 className="mb-3 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
           Formatting reference
-        </h3>
+        </h2>
         <p className="mb-6 text-[15.5px] leading-[1.65] text-muted">
           Every toolbar button inserts one of these markers. You can also type
           them directly — the preview updates either way.
@@ -120,9 +149,9 @@ export default function EpubStudioGuide() {
         </div>
 
         {/* FAQ */}
-        <h3 className="mb-6 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
+        <h2 className="mb-6 font-heading text-[24px] font-bold tracking-[-0.01em] text-text">
           Frequently asked questions
-        </h3>
+        </h2>
 
         <div className="mb-12 grid gap-3">
           {faqs.map((faq) => (

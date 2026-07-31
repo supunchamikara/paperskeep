@@ -172,6 +172,28 @@
   color: var(--es-warning);
 }
 
+/* Secondary action beside Export: present but never competing with it. */
+.epub-studio .btn-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--es-border);
+  border-radius: 7px;
+  background: var(--es-bg);
+  color: var(--es-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.epub-studio .btn-help:hover {
+  border-color: var(--es-accent);
+  color: var(--es-accent);
+}
+
 /* Primary action — matches the site's Subscribe button treatment */
 .epub-studio .btn-export {
   display: inline-flex;

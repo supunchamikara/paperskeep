@@ -33,6 +33,7 @@ export async function GET() {
     "",
     "## Tools",
     `- [EPUB Studio](${base}/tools/epub-studio): Free KDP-optimized EPUB 3 creator. Write or paste novel chapters in a light markup, preview them in a Kindle-style reader, set metadata, typography, chapter-title styling and a cover, then export an ebook ready for Kindle Direct Publishing. Runs entirely client-side — no account, no upload, no storage.`,
+    `- [EPUB Studio Guide](${base}/tools/epub-studio/guide): How to use EPUB Studio — the formatting markup reference, chapter and typography options, KDP cover sizes, a five-step walkthrough and FAQs.`,
     "",
     "## Feeds",
     `- RSS: ${base}/rss.xml`,
