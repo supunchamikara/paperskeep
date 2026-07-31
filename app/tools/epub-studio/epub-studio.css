@@ -539,6 +539,13 @@
   border-color: var(--es-accent);
 }
 
+.epub-studio .text-area {
+  min-height: 74px;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+}
+
 /* Segmented option grids (font / alignment / size) */
 
 .epub-studio .option-grid {
@@ -839,7 +846,22 @@
 
 .epub-studio .preview-head {
   flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 11px;
+}
+
+/* Chapter / title-page switch: narrow enough to sit beside the heading */
+.epub-studio .preview-switch {
+  flex: 0 0 auto;
+  width: 172px;
+}
+
+.epub-studio .preview-switch .option-btn {
+  padding: 6px 4px;
+  font-size: 11px;
 }
 
 .epub-studio .preview-head h2 {
@@ -1012,6 +1034,78 @@
   font-weight: 700;
   line-height: 0.85;
   color: var(--es-accent-strong);
+}
+
+/* ---------- Title page preview ---------- */
+
+/* Mirrors the .titlepage-* rules the generator writes into the EPUB. */
+.epub-studio .tp-frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  text-align: center;
+}
+
+.epub-studio .tp-head {
+  margin-top: 8%;
+}
+
+.epub-studio .tp-title {
+  margin: 0 0 0.5em;
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.epub-studio .tp-subtitle {
+  margin: 0 0 1.6em;
+  font-size: 1.05em;
+  font-style: italic;
+  text-align: center;
+  color: rgba(39, 33, 28, 0.78);
+}
+
+.epub-studio .tp-rule {
+  width: 28%;
+  margin: 0 auto 1.6em;
+  border: none;
+  border-top: 1px solid rgba(39, 33, 28, 0.3);
+}
+
+.epub-studio .tp-intro {
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.epub-studio .tp-intro p {
+  margin: 0 0 0.9em;
+  font-size: 0.92em;
+  text-align: center;
+  text-indent: 0;
+  color: rgba(39, 33, 28, 0.8);
+}
+
+.epub-studio .tp-foot {
+  margin-top: 3em;
+  padding-bottom: 6%;
+}
+
+.epub-studio .tp-author {
+  margin: 0;
+  font-size: 1em;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.epub-studio .tp-publisher {
+  margin: 0.6em 0 0;
+  font-size: 0.8em;
+  text-align: center;
+  color: rgba(39, 33, 28, 0.6);
 }
 
 /* ---------- Responsive: stack the columns, drop the resizers ---------- */

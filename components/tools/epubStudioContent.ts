@@ -67,6 +67,10 @@ export const steps = [
     body: "Kindle Direct Publishing recommends a 1:1.6 cover, ideally 1600 × 2560 pixels and at least 1000 pixels tall. The tool measures your image and flags anything outside that range.",
   },
   {
+    title: "Set up the title page",
+    body: "The Title Page panel adds a page between the cover and Chapter 1, carrying the book title, a subtitle, a short intro, and the author name at the foot of the page. Switch the preview to Title Page to see it, or turn the page off if you don't want one.",
+  },
+  {
     title: "Style the book",
     body: "Pick the body font, alignment and size, then tune chapter titles — spacing, size, case and alignment — until the preview reads the way you want it to.",
   },

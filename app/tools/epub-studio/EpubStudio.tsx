@@ -70,6 +70,11 @@ type TitleStyle = {
 
 type Metadata = {
   title: string;
+  subtitle: string;
+  /** Short blurb printed under the title on the title page. */
+  intro: string;
+  /** The title page sits between the cover and chapter one. */
+  showTitlePage: boolean;
   author: string;
   publisher: string;
   language: string;
@@ -205,6 +210,21 @@ The gangway took her weight without complaint. Below, the water folded and unfol
 
 By morning the coast was a rumour and the ship had settled into its own weather.`;
 
+const INITIAL_METADATA: Metadata = {
+  title: "My Epic Novel",
+  subtitle: "A Novel",
+  intro: "",
+  showTitlePage: true,
+  author: "Author Name",
+  publisher: "Self-Published",
+  language: "en",
+  baseFontSize: "md",
+  fontStyle: "serif",
+  alignment: "justify",
+  titleStyle: DEFAULT_TITLE_STYLE,
+  cover: null,
+};
+
 const INITIAL_CHAPTERS: Chapter[] = [
   {
     id: "ch-1",
@@ -260,17 +280,7 @@ function coverWarning(cover: CoverImage): string | null {
 /* ------------------------------------------------------------------ */
 
 export default function EpubStudio() {
-  const [metadata, setMetadata] = useState<Metadata>({
-    title: "My Epic Novel",
-    author: "Author Name",
-    publisher: "Self-Published",
-    language: "en",
-    baseFontSize: "md",
-    fontStyle: "serif",
-    alignment: "justify",
-    titleStyle: DEFAULT_TITLE_STYLE,
-    cover: null,
-  });
+  const [metadata, setMetadata] = useState<Metadata>(INITIAL_METADATA);
 
   const [chapters, setChapters] = useState<Chapter[]>(INITIAL_CHAPTERS);
   const [inlineImages, setInlineImages] = useState<InlineImages>(
@@ -284,6 +294,12 @@ export default function EpubStudio() {
     status: "idle",
     message: "",
   });
+
+  // The preview shows one page at a time: either the active chapter or the
+  // title page, which has no chapter of its own to hang off.
+  const [previewMode, setPreviewMode] = useState<"chapter" | "title">(
+    "chapter"
+  );
 
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT);
   const [previewWidth, setPreviewWidth] = useState(PREVIEW_DEFAULT);
@@ -318,6 +334,11 @@ export default function EpubStudio() {
     if (!parse || !activeChapter) return "";
     return parse(activeChapter.content, inlineImages, true);
   }, [parse, activeChapter, inlineImages]);
+
+  const introHtml = useMemo(() => {
+    if (!parse || !metadata.intro) return "";
+    return parse(metadata.intro, {}, true);
+  }, [parse, metadata.intro]);
 
   /* ---------- draft autosave ---------- */
 
@@ -422,17 +443,7 @@ export default function EpubStudio() {
     );
     if (!confirmed) return;
     clearDraft();
-    setMetadata({
-      title: "My Epic Novel",
-      author: "Author Name",
-      publisher: "Self-Published",
-      language: "en",
-      baseFontSize: "md",
-      fontStyle: "serif",
-      alignment: "justify",
-      titleStyle: DEFAULT_TITLE_STYLE,
-      cover: null,
-    });
+    setMetadata(INITIAL_METADATA);
     setChapters(INITIAL_CHAPTERS);
     setInlineImages(INITIAL_INLINE_IMAGES);
     setActiveChapterId("ch-1");
@@ -718,6 +729,19 @@ export default function EpubStudio() {
       titleStyle.transform === "smallcaps" ? "small-caps" : "normal",
     borderBottom: titleStyle.rule ? "1px solid rgba(39, 33, 28, 0.35)" : "none",
     paddingBottom: titleStyle.rule ? "0.4em" : 0,
+  };
+
+  // Turning the title page off while it is on screen must not leave the
+  // preview blank, so the chapter is the fallback in every other case.
+  const showTitlePreview = metadata.showTitlePage && previewMode === "title";
+
+  // The title page borrows only the chapter title's typeface — its size and
+  // spacing are its own, matching the stylesheet the generator writes.
+  const previewBookTitleStyle: React.CSSProperties = {
+    fontFamily:
+      titleStyle.font === "sans"
+        ? "var(--font-montserrat), system-ui, sans-serif"
+        : "var(--font-lora), Georgia, serif",
   };
 
   return (
@@ -1046,6 +1070,79 @@ export default function EpubStudio() {
                       }
                     />
                   </div>
+                </div>
+
+                {/* --- Title page --- */}
+                <div className="settings-group">
+                  <span className="settings-label">Title Page</span>
+                  <p className="settings-hint">
+                    A page after the cover and before Chapter 1. It prints the
+                    book title, subtitle and intro, with the author name at the
+                    foot of the page.
+                  </p>
+
+                  <button
+                    type="button"
+                    className="switch-label switch-row"
+                    aria-pressed={metadata.showTitlePage}
+                    onClick={() =>
+                      setMetadata((prev) => ({
+                        ...prev,
+                        showTitlePage: !prev.showTitlePage,
+                      }))
+                    }
+                  >
+                    <span
+                      className={`switch ${metadata.showTitlePage ? "on" : ""}`}
+                      aria-hidden="true"
+                    />
+                    Include title page
+                  </button>
+
+                  {metadata.showTitlePage && (
+                    <>
+                      <div className="field">
+                        <label className="field-label" htmlFor="es-subtitle">
+                          Subtitle
+                        </label>
+                        <input
+                          id="es-subtitle"
+                          className="text-input"
+                          placeholder="A Novel"
+                          value={metadata.subtitle}
+                          onChange={(e) =>
+                            setMetadata((prev) => ({
+                              ...prev,
+                              subtitle: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="field-label" htmlFor="es-intro">
+                          Small Intro
+                        </label>
+                        <textarea
+                          id="es-intro"
+                          className="text-input text-area"
+                          rows={4}
+                          placeholder="A line or two setting up the book — an epigraph, a tagline, a dedication."
+                          value={metadata.intro}
+                          onChange={(e) =>
+                            setMetadata((prev) => ({
+                              ...prev,
+                              intro: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <p className="settings-hint">
+                        Title and author come from Ebook Metadata above.
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 {/* --- Styling --- */}
@@ -1548,15 +1645,43 @@ export default function EpubStudio() {
         {/* ---------------- Preview ---------------- */}
         <section className="preview-panel" style={{ width: previewWidth }}>
           <div className="preview-head">
-            <h2>Live Preview</h2>
-            <p>Simulating Kindle Paper</p>
+            <div>
+              <h2>Live Preview</h2>
+              <p>Simulating Kindle Paper</p>
+            </div>
+
+            {metadata.showTitlePage && (
+              <div className="option-grid cols-2 preview-switch">
+                {(
+                  [
+                    ["title", "Title Page"],
+                    ["chapter", "Chapter"],
+                  ] as ["title" | "chapter", string][]
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`option-btn ${
+                      showTitlePreview === (value === "title") ? "active" : ""
+                    }`}
+                    onClick={() => setPreviewMode(value)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="book-device">
             <div
               className={`book-screen font-${metadata.fontStyle} align-${
                 metadata.alignment
-              } ${activeChapter?.dropCap ? "has-drop-cap" : ""}`}
+              } ${
+                !showTitlePreview && activeChapter?.dropCap
+                  ? "has-drop-cap"
+                  : ""
+              }`}
               style={
                 {
                   "--preview-font-size":
@@ -1564,16 +1689,44 @@ export default function EpubStudio() {
                 } as React.CSSProperties
               }
             >
-              {activeChapter && (
-                <>
-                  <h3 className="preview-title" style={previewTitleStyle}>
-                    {activeChapter.title}
-                  </h3>
-                  <div
-                    className="preview-body"
-                    dangerouslySetInnerHTML={{ __html: previewHtml }}
-                  />
-                </>
+              {showTitlePreview ? (
+                <div className="tp-frame">
+                  <div className="tp-head">
+                    <h3 className="tp-title" style={previewBookTitleStyle}>
+                      {metadata.title || "Untitled Novel"}
+                    </h3>
+                    {metadata.subtitle && (
+                      <p className="tp-subtitle">{metadata.subtitle}</p>
+                    )}
+                    <hr className="tp-rule" />
+                    {introHtml && (
+                      <div
+                        className="preview-body tp-intro"
+                        dangerouslySetInnerHTML={{ __html: introHtml }}
+                      />
+                    )}
+                  </div>
+                  <div className="tp-foot">
+                    <p className="tp-author">
+                      {metadata.author || "Anonymous Creator"}
+                    </p>
+                    {metadata.publisher && (
+                      <p className="tp-publisher">{metadata.publisher}</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                activeChapter && (
+                  <>
+                    <h3 className="preview-title" style={previewTitleStyle}>
+                      {activeChapter.title}
+                    </h3>
+                    <div
+                      className="preview-body"
+                      dangerouslySetInnerHTML={{ __html: previewHtml }}
+                    />
+                  </>
+                )
               )}
             </div>
           </div>

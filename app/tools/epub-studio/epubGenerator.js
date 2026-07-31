@@ -366,6 +366,94 @@ body.cover-page {
   width: auto;
   height: auto;
 }
+
+/* ---- Title page: title/subtitle/intro at the top, author at the foot ---- */
+body.title-page {
+  text-align: center;
+}
+
+.titlepage-frame {
+  /* Flex pins the author block to the foot of the page on readers that
+     support it; readers that ignore flex simply stack the blocks in order,
+     which still reads correctly. */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 88%;
+  height: 88%;
+  page-break-after: always;
+}
+
+.titlepage-head {
+  margin-top: 2em;
+}
+
+.title-page h1.titlepage-title {
+  font-family: ${titleFont};
+  font-size: 2.4em;
+  font-weight: bold;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5em 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.titlepage-subtitle {
+  font-family: ${titleFont};
+  font-size: 1.15em;
+  font-style: italic;
+  font-weight: normal;
+  color: #333333;
+  text-align: center;
+  text-indent: 0;
+  margin: 0 0 1.6em 0;
+}
+
+.titlepage-rule {
+  width: 28%;
+  margin: 0 auto 1.6em auto;
+  border: none;
+  border-top: 1px solid #999999;
+}
+
+.titlepage-intro {
+  margin: 0 auto;
+  max-width: 80%;
+}
+
+.titlepage-intro p {
+  font-size: 0.95em;
+  text-align: center;
+  text-indent: 0;
+  margin: 0 0 0.9em 0;
+  color: #333333;
+}
+
+.titlepage-foot {
+  margin-top: 3em;
+  margin-bottom: 1.5em;
+}
+
+.titlepage-author {
+  font-family: ${titleFont};
+  font-size: 1.1em;
+  text-align: center;
+  text-indent: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.titlepage-publisher {
+  font-size: 0.85em;
+  text-align: center;
+  text-indent: 0;
+  color: #555555;
+  margin: 0.6em 0 0 0;
+}
 ${titleCss}`;
   zip.file('OEBPS/styles.css', stylesCss);
 
@@ -480,6 +568,40 @@ ${titleCss}`;
     coverInfo = { fileName, mimeType, isSvgWrapped: hasDimensions };
   }
 
+  // 5c. Title page: sits between the cover and the first chapter. Holds the
+  // book title, an optional subtitle and short intro, with the author's name
+  // anchored at the foot of the page.
+  const hasTitlePage = metadata.showTitlePage !== false;
+  if (hasTitlePage) {
+    const introHtml = metadata.intro
+      ? `<div class="titlepage-intro">${parseContentToHTML(metadata.intro, {})}</div>`
+      : '';
+
+    const titlePageXhtml = `<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="${escapeXml(metadata.language || 'en')}">
+<head>
+  <title>${escapeXml(metadata.title || 'Untitled Novel')}</title>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
+<body class="title-page" epub:type="titlepage">
+  <div class="titlepage-frame">
+    <div class="titlepage-head">
+      <h1 class="titlepage-title">${escapeXml(metadata.title || 'Untitled Novel')}</h1>
+      ${metadata.subtitle ? `<p class="titlepage-subtitle">${escapeXml(metadata.subtitle)}</p>` : ''}
+      <hr class="titlepage-rule" />
+      ${introHtml}
+    </div>
+    <div class="titlepage-foot">
+      <p class="titlepage-author">${escapeXml(metadata.author || 'Anonymous Creator')}</p>
+      ${metadata.publisher ? `<p class="titlepage-publisher">${escapeXml(metadata.publisher)}</p>` : ''}
+    </div>
+  </div>
+</body>
+</html>`;
+    oebps.file('titlepage.xhtml', titlePageXhtml);
+  }
+
   // 6. Create OEBPS/toc.ncx (EPUB 2 backward compatibility)
   const uuid = generateUUID();
   const modifiedTime = new Date().toISOString().split('.')[0] + 'Z';
@@ -495,9 +617,15 @@ ${titleCss}`;
   <docTitle>
     <text>${escapeXml(metadata.title || 'Untitled Novel')}</text>
   </docTitle>
-  <navMap>
+  <navMap>${hasTitlePage ? `
+    <navPoint id="navpoint-titlepage" playOrder="1">
+      <navLabel>
+        <text>Title Page</text>
+      </navLabel>
+      <content src="titlepage.xhtml"/>
+    </navPoint>` : ''}
     ${chapters.map((ch, idx) => `
-    <navPoint id="navpoint-${idx + 1}" playOrder="${idx + 1}">
+    <navPoint id="navpoint-${idx + 1}" playOrder="${idx + 1 + (hasTitlePage ? 1 : 0)}">
       <navLabel>
         <text>${escapeXml(ch.title)}</text>
       </navLabel>
@@ -524,14 +652,13 @@ ${titleCss}`;
   <nav epub:type="toc" id="toc">
     <h1>Table of Contents</h1>
     <ol>
-      ${chapters.map((ch, idx) => `<li><a href="chapters/chapter_${idx + 1}.xhtml">${escapeXml(ch.title)}</a></li>`).join('\n      ')}
+      ${hasTitlePage ? `<li><a href="titlepage.xhtml">Title Page</a></li>\n      ` : ''}${chapters.map((ch, idx) => `<li><a href="chapters/chapter_${idx + 1}.xhtml">${escapeXml(ch.title)}</a></li>`).join('\n      ')}
     </ol>
   </nav>
-${coverInfo ? `  <nav epub:type="landmarks" id="landmarks" hidden="hidden">
+${coverInfo || hasTitlePage ? `  <nav epub:type="landmarks" id="landmarks" hidden="hidden">
     <h1>Landmarks</h1>
     <ol>
-      <li><a epub:type="cover" href="cover.xhtml">Cover</a></li>
-      <li><a epub:type="toc" href="nav.xhtml">Table of Contents</a></li>
+${coverInfo ? `      <li><a epub:type="cover" href="cover.xhtml">Cover</a></li>\n` : ''}${hasTitlePage ? `      <li><a epub:type="titlepage" href="titlepage.xhtml">Title Page</a></li>\n` : ''}      <li><a epub:type="toc" href="nav.xhtml">Table of Contents</a></li>
       <li><a epub:type="bodymatter" href="chapters/chapter_1.xhtml">Start of Content</a></li>
     </ol>
   </nav>
@@ -557,12 +684,14 @@ ${coverInfo ? `  <nav epub:type="landmarks" id="landmarks" hidden="hidden">
     <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
     <item id="stylesheet" href="styles.css" media-type="text/css"/>${coverInfo ? `
     <item id="cover-image" href="images/${coverInfo.fileName}" media-type="${coverInfo.mimeType}" properties="cover-image"/>
-    <item id="cover-page" href="cover.xhtml" media-type="application/xhtml+xml"${coverInfo.isSvgWrapped ? ' properties="svg"' : ''}/>` : ''}
+    <item id="cover-page" href="cover.xhtml" media-type="application/xhtml+xml"${coverInfo.isSvgWrapped ? ' properties="svg"' : ''}/>` : ''}${hasTitlePage ? `
+    <item id="title-page" href="titlepage.xhtml" media-type="application/xhtml+xml"/>` : ''}
     ${chapters.map((ch, idx) => `<item id="chapter_${idx + 1}" href="chapters/chapter_${idx + 1}.xhtml" media-type="application/xhtml+xml"/>`).join('\n    ')}
     ${manifestImages.map(img => `<item id="img_${img.id}" href="images/${img.fileName}" media-type="${img.mimeType}"/>`).join('\n    ')}
   </manifest>
   <spine toc="ncx">${coverInfo ? `
-    <itemref idref="cover-page" linear="yes"/>` : ''}
+    <itemref idref="cover-page" linear="yes"/>` : ''}${hasTitlePage ? `
+    <itemref idref="title-page" linear="yes"/>` : ''}
     ${chapters.map((ch, idx) => `<itemref idref="chapter_${idx + 1}"/>`).join('\n    ')}
   </spine>${coverInfo ? `
   <guide>
