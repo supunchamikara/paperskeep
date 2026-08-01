@@ -22,6 +22,11 @@ const nav: NavItem[] = [
         href: "/tools/epub-studio",
         description: "KDP-optimized EPUB creator",
       },
+      {
+        label: "Cover Designer",
+        href: "/tools/cover-designer",
+        description: "Book cover maker — PNG & JPG",
+      },
     ],
   },
   { label: "About", href: "/about" },
@@ -34,9 +39,11 @@ const nav: NavItem[] = [
  */
 export const siteConfig = {
   name: "Paperskeep",
-  title: "Paperskeep — Thoughtful writing on tech, business & culture",
+  // Kept under ~60 / ~160 characters: past that, Google truncates the title
+  // and rewrites the description itself.
+  title: "Paperskeep — Thoughtful writing on tech, business & living well",
   description:
-    "Paperskeep is a modern publication covering the systems, tools, and people building a more thoughtful internet. Long-form writing on technology, business, lifestyle, and culture.",
+    "Paperskeep is an independent publication covering technology, business and culture alongside style, beauty, health and living well — plus free browser-based tools.",
   // Prefer the deployment URL when available; falls back to localhost in dev.
   url:
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -47,26 +54,51 @@ export const siteConfig = {
   twitterHandle: "@paperskeep",
   nav,
   // Single source of truth for categories. Add or remove one here and it
-  // updates the filter pills, the admin post form, and server validation.
+  // updates the filter pills, the admin post form, server validation, the
+  // category pages and the sitemap. Grouped by desk so a line can be dropped
+  // without hunting. A category with no published posts is still selectable in
+  // the editor, but its page is noindexed and kept out of the sitemap until it
+  // has something in it.
   categories: [
+    // Core desks
     "Technology",
+    "AI",
     "Business",
-    "Lifestyle",
-    "Culture",
-    "Science",
     "Finance",
+    "Marketing",
+    "Science",
     "Design",
+    "Culture",
     "Opinion",
+    // Life
+    "Lifestyle",
+    "Health",
+    "Fitness",
+    "Food",
+    "Travel",
+    "Home",
+    "Relationships",
+    "Parenting",
+    // Work and self
+    "Career",
+    "Productivity",
+    "Books",
     "Ikigai",
     "Quotes",
+    // Style and beauty
     "Fashion",
+    "Beauty",
+    "Skincare",
+    "Makeup",
     "Hair Styles",
+    "Nail Art",
+    "Weddings",
   ] as const,
   // The publication is the byline — articles are credited to Paperskeep itself.
   author: {
     name: "Paperskeep",
     role: "Editorial Team",
-    bio: "Paperskeep is a small, independent publication about the systems, tools, and people building a more thoughtful internet.",
+    bio: "Paperskeep is a small, independent publication about technology, business and culture — and about style, health and living well.",
   },
   social: [
     { label: "Paperskeep on X", href: "https://x.com/paperskeep", short: "X" },

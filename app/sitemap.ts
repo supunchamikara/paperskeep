@@ -21,6 +21,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    {
+      url: `${base}/tools/cover-designer`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     { url: `${base}/about`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${base}/contact`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${base}/privacy`, changeFrequency: "yearly", priority: 0.3 },
@@ -34,14 +39,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Dedicated category pages.
-  const categoryRoutes: MetadataRoute.Sitemap = siteConfig.categories.map(
-    (category) => ({
+  // Dedicated category pages. Only the ones that have something in them: an
+  // empty category page is a thin page, and submitting it invites Google to
+  // index a heading and nothing else.
+  const usedCategories = new Set(posts.map((post) => post.category));
+  const categoryRoutes: MetadataRoute.Sitemap = siteConfig.categories
+    .filter((category) => usedCategories.has(category))
+    .map((category) => ({
       url: `${base}/category/${slugifyTerm(category)}`,
       changeFrequency: "weekly",
       priority: 0.6,
-    })
-  );
+    }));
 
   // Dedicated tag pages.
   const tags = await getAllTags();

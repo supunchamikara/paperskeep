@@ -1,5 +1,6 @@
 import { getAllPosts } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { COVER_STYLES } from "@/app/tools/cover-designer/coverStyles";
 
 /**
  * /llms.txt — a concise, machine-readable map of the site for AI assistants
@@ -34,6 +35,7 @@ export async function GET() {
     "## Tools",
     `- [EPUB Studio](${base}/tools/epub-studio): Free KDP-optimized EPUB 3 creator. Write or paste novel chapters in a light markup, preview them in a Kindle-style reader, set metadata, typography, chapter-title styling and a cover, then export an ebook ready for Kindle Direct Publishing. Runs entirely client-side — no account, no upload, no storage.`,
     `- [EPUB Studio Guide](${base}/tools/epub-studio/guide): How to use EPUB Studio — the formatting markup reference, chapter and typography options, KDP cover sizes, a five-step walkthrough and FAQs.`,
+    `- [Cover Designer](${base}/tools/cover-designer): Free book cover maker. Upload, drop or paste an image, then set the title, subtitle, series line and author in professional cover typography — ${COVER_STYLES.length} genre style presets covering literary, thriller, fantasy, romance, true crime, author-brand bestseller, graphic-novel and children's layouts, serif, display, vector, sans, script and typewriter typefaces, weight, tracking, letter case, colour, drop shadows, outlines, bands and hairline rules — on Kindle, print, audiobook or custom trim sizes, and export a full-resolution PNG or JPG. The design autosaves in the browser and is restored on reload, with a reset-to-default button. Runs entirely client-side — no account, no upload, nothing leaves the device.`,
     "",
     "## Feeds",
     `- RSS: ${base}/rss.xml`,

@@ -66,19 +66,14 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  keywords: [
-    "blog",
-    "technology",
-    "business",
-    "culture",
-    "lifestyle",
-    "long-form",
-    ...siteConfig.categories,
-  ],
+  // The category list already covers the topical terms; repeating them here
+  // only produced duplicates ("technology" twice) with nothing to gain.
+  keywords: ["blog", "magazine", "long-form", ...siteConfig.categories],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
   publisher: siteConfig.name,
-  category: "technology",
+  // The publication is no longer single-desk; "magazine" is the honest label.
+  category: "magazine",
   openGraph: {
     type: "website",
     locale: siteConfig.locale,

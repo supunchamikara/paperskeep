@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import { siteConfig } from "@/lib/site";
+// Types-only module: importing it here does not pull the tool's fonts or
+// client bundle into the index page, and keeps the preset count honest.
+import { COVER_STYLES } from "./cover-designer/coverStyles";
 
 const TITLE = "Tools — Free Browser-Based Tools";
 const DESCRIPTION =
@@ -35,7 +38,16 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const tools = [
+type Tool = {
+  href: string;
+  name: string;
+  tagline: string;
+  description: string;
+  /** Tools with their own documentation page link to it from the card. */
+  guideHref?: string;
+};
+
+const tools: Tool[] = [
   {
     href: "/tools/epub-studio",
     name: "EPUB Studio",
@@ -43,6 +55,12 @@ const tools = [
     description:
       "Write or paste your novel in a light markup, watch a live Kindle-style preview, set metadata, styling and a cover, then export a valid EPUB 3 file. Runs entirely in your browser.",
     guideHref: "/tools/epub-studio/guide",
+  },
+  {
+    href: "/tools/cover-designer",
+    name: "Cover Designer",
+    tagline: "Book cover maker — PNG & JPG",
+    description: `Upload an image, set your title and author in professional cover typography — ${COVER_STYLES.length} genre styles, a library of book-cover typefaces, shadows, outlines and rules — then export a Kindle, print or audiobook cover as a PNG or JPG.`,
   },
 ];
 
@@ -126,12 +144,14 @@ export default function ToolsPage() {
               <Link href={tool.href} className="text-accent hover:text-accent-strong">
                 Open {tool.name} →
               </Link>
-              <Link
-                href={tool.guideHref}
-                className="text-muted underline underline-offset-[3px] hover:text-accent"
-              >
-                Read the guide
-              </Link>
+              {tool.guideHref && (
+                <Link
+                  href={tool.guideHref}
+                  className="text-muted underline underline-offset-[3px] hover:text-accent"
+                >
+                  Read the guide
+                </Link>
+              )}
             </div>
           </li>
         ))}
