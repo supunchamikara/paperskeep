@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import type { PostRow } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { slugifyTerm } from "@/lib/slug";
 
 export interface ActionResult {
   error?: string;
@@ -62,14 +63,42 @@ function parseForm(formData: FormData) {
   };
 }
 
-/** Revalidate every public surface that lists or shows posts. */
-function revalidatePublic(slug?: string) {
+/** The surfaces a single post appears on, beyond the site-wide lists. */
+interface PostSurfaces {
+  slug?: string | null;
+  category?: string | null;
+  tags?: string[] | null;
+}
+
+/** The columns revalidatePublic needs — select these on mutations. */
+const SURFACE_COLUMNS = "slug, category, tags";
+
+/**
+ * Revalidate every public surface that lists or shows posts, so a publish is
+ * live everywhere — page, feeds, sitemap, LLM map, search — without waiting on
+ * ISR. Pass the post as it is now and, on an edit, as it was before: a changed
+ * slug, category or tag leaves the old page stale otherwise.
+ */
+function revalidatePublic(...posts: (PostSurfaces | null | undefined)[]) {
+  // Site-wide surfaces: each is built from the full post list, so any
+  // create/edit/delete can change it.
   revalidatePath("/");
   revalidatePath("/articles");
   revalidatePath("/sitemap.xml");
   revalidatePath("/rss.xml");
-  if (slug) revalidatePath(`/articles/${slug}`);
+  revalidatePath("/llms.txt");
+  revalidatePath("/api/search");
   revalidatePath("/admin");
+
+  // Per-post surfaces. Deduped: an edit usually passes the same values twice.
+  const paths = new Set<string>();
+  for (const post of posts) {
+    if (!post) continue;
+    if (post.slug) paths.add(`/articles/${post.slug}`);
+    if (post.category) paths.add(`/category/${slugifyTerm(post.category)}`);
+    for (const tag of post.tags ?? []) paths.add(`/tag/${slugifyTerm(tag)}`);
+  }
+  paths.forEach((path) => revalidatePath(path));
 }
 
 export async function createPost(
@@ -88,7 +117,7 @@ export async function createPost(
     return { error: error.message };
   }
 
-  revalidatePublic(parsed.values.slug);
+  revalidatePublic(parsed.values);
   redirect("/admin");
 }
 
@@ -101,6 +130,14 @@ export async function updatePost(
   if ("error" in parsed) return { error: parsed.error };
 
   const supabase = createClient(await cookies());
+  // Read the pre-edit values first: if the slug, category or tags changed,
+  // the pages they used to live on need purging too.
+  const { data: before } = await supabase
+    .from("posts")
+    .select(SURFACE_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("posts")
     .update(parsed.values)
@@ -112,7 +149,7 @@ export async function updatePost(
     return { error: error.message };
   }
 
-  revalidatePublic(parsed.values.slug);
+  revalidatePublic(parsed.values, before as PostSurfaces | null);
   redirect("/admin");
 }
 
@@ -120,12 +157,12 @@ export async function deletePost(id: string) {
   const supabase = createClient(await cookies());
   const { data } = await supabase
     .from("posts")
-    .select("slug")
+    .select(SURFACE_COLUMNS)
     .eq("id", id)
     .maybeSingle();
 
   await supabase.from("posts").delete().eq("id", id);
-  revalidatePublic((data as { slug?: string } | null)?.slug);
+  revalidatePublic(data as PostSurfaces | null);
 }
 
 /** Quick publish/unpublish toggle from the dashboard. */
@@ -135,9 +172,9 @@ export async function togglePublish(id: string, published: boolean) {
     .from("posts")
     .update({ published })
     .eq("id", id)
-    .select("slug")
+    .select(SURFACE_COLUMNS)
     .maybeSingle();
-  revalidatePublic((data as { slug?: string } | null)?.slug);
+  revalidatePublic(data as PostSurfaces | null);
 }
 
 /** Quick feature/unfeature toggle from the dashboard. */
@@ -147,9 +184,9 @@ export async function toggleFeatured(id: string, featured: boolean) {
     .from("posts")
     .update({ featured })
     .eq("id", id)
-    .select("slug")
+    .select(SURFACE_COLUMNS)
     .maybeSingle();
-  revalidatePublic((data as { slug?: string } | null)?.slug);
+  revalidatePublic(data as PostSurfaces | null);
 }
 
 export async function signOut() {
